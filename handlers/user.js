@@ -81,115 +81,101 @@ module.exports.uploadProfile = async (req, res) => {
 };
 module.exports.getUsers = async (req, res) => {
     try {
-        const usersSnapshot = await db.collection('users').get(); // ดึงข้อมูลผู้ใช้ทั้งหมด
-        const users = [];
-
-        for (const doc of usersSnapshot.docs) {
-            const userData = doc.data();
-            userData.id = doc.id; // เพิ่ม ID ของผู้ใช้
-            userData.birthdate = fc.formatDate(userData.birthdate); // แปลง birthdate เป็นวันที่ที่เข้าใจได้
-
-            // // ดึงข้อมูล address
-            // const addressSnapshot = await doc.ref.collection('address').get();
-            // const addressData = addressSnapshot.docs.map(addressDoc => addressDoc.data());
-            // userData.address = addressData; // เพิ่ม address เข้าไปใน userData
-
-            users.push(userData); // เก็บ userData ลงใน array
-        }
-
-        res.json(users); // ส่งข้อมูลกลับไป
+      const usersSnapshot = await db.collection('users').get(); // Fetch all users
+      const users = [];
+  
+      for (const doc of usersSnapshot.docs) {
+        const userData = doc.data();
+        userData.id = doc.id; // Add user ID
+        userData.birthdate = fc.formatDate(userData.birthdate); // Format birthdate
+        userData.age = fc.calculateAge(userData.birthdate); // Calculate and add age
+  
+        users.push(userData); // Add user data to array
+      }
+  
+      res.json(users); // Send users data
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error getting users: ' + error.message }); // ข้อความข้อผิดพลาด
+      console.error(error);
+      res.status(500).json({ message: 'Error getting users: ' + error.message });
     }
-};
+  };
 
-module.exports.getUserById = async (req, res) => {
+  module.exports.getUserById = async (req, res) => {
     try {
-        const userId = req.params.id; // รับ ID ของผู้ใช้จาก URL parameters
-        const userDoc = await db.collection('users').doc(userId).get(); // ดึงเอกสารของผู้ใช้
-
-        if (!userDoc.exists) {
-            res.status(404).json({ message: 'User not found' }); // ถ้าไม่พบผู้ใช้
-            return;
-        }
-
-        const userData = userDoc.data();
-        userData.id = userDoc.id; // เพิ่ม ID ของผู้ใช้
-        userData.birthdate = fc.formatDate(userData.birthdate); // แปลง birthdate เป็นวันที่
-
-        // // ดึงข้อมูล address
-        // const addressSnapshot = await userDoc.ref.collection('address').get();
-        // const addressData = addressSnapshot.docs.map(addressDoc => addressDoc.data());
-        // userData.address = addressData; // เพิ่ม address เข้าไปใน userData
-
-        res.json(userData); // ส่งข้อมูลกลับไป
+      const userId = req.params.id; // Get user ID from URL parameters
+      const userDoc = await db.collection('users').doc(userId).get(); // Fetch user document
+  
+      if (!userDoc.exists) {
+        res.status(404).json({ message: 'User not found' });
+        return;
+      }
+  
+      const userData = userDoc.data();
+      userData.id = userDoc.id; // Add user ID
+      userData.birthdate = fc.formatDate(userData.birthdate); // Format birthdate
+      userData.age = fc.calculateAge(userData.birthdate); // Calculate and add age
+  
+      res.json(userData); // Send user data
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error retrieving user: ' + error.message }); // ข้อความข้อผิดพลาด
+      console.error(error);
+      res.status(500).json({ message: 'Error retrieving user: ' + error.message });
     }
-};
-module.exports.getUsersByCompanyBranch = async (req, res) => {
+  };
+  module.exports.getUsersByCompanyBranch = async (req, res) => {
     try {
-        const companyBranch = req.params.branch; // รับสาขาจาก URL parameter
-        const usersSnapshot = await db.collection('users').where('companybranch', '==', companyBranch).get(); // ดึงข้อมูลผู้ใช้ตามสาขาของบริษัท
-
-        if (usersSnapshot.empty) {
-            res.status(404).json({ message: 'No users found in this company branch' }); // ถ้าไม่พบผู้ใช้ในสาขานี้
-            return;
-        }
-
-        const users = [];
-        
-        for (const doc of usersSnapshot.docs) {
-            const userData = doc.data();
-            userData.id = doc.id; // เพิ่ม ID ของผู้ใช้
-            
-            // // ดึงข้อมูลที่อยู่
-            // const addressSnapshot = await doc.ref.collection('address').get();
-            // const addressData = addressSnapshot.docs.map(addressDoc => addressDoc.data());
-            // userData.address = addressData; // เพิ่มที่อยู่เข้าไปในข้อมูลผู้ใช้
-            
-            users.push(userData); // เพิ่มผู้ใช้ลงใน array
-        }
-
-        res.json(users); // ส่งข้อมูลผู้ใช้กลับไป
+      const companyBranch = req.params.branch; // Get company branch from URL parameter
+      const usersSnapshot = await db.collection('users').where('companybranch', '==', companyBranch).get(); // Fetch users by company branch
+  
+      if (usersSnapshot.empty) {
+        res.status(404).json({ message: 'No users found in this company branch' });
+        return;
+      }
+  
+      const users = [];
+  
+      for (const doc of usersSnapshot.docs) {
+        const userData = doc.data();
+        userData.id = doc.id; // Add user ID
+        userData.birthdate = fc.formatDate(userData.birthdate); // Format birthdate
+        userData.age = fc.calculateAge(userData.birthdate); // Calculate and add age
+  
+        users.push(userData); // Add user data to array
+      }
+  
+      res.json(users); // Send users data
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error getting users by company branch: ' + error.message }); // ข้อความข้อผิดพลาด
+      console.error(error);
+      res.status(500).json({ message: 'Error getting users by company branch: ' + error.message });
     }
-};
+  };
 
-module.exports.getUsersByDepartment = async (req, res) => {
+  module.exports.getUsersByDepartment = async (req, res) => {
     try {
-        const department = req.params.department; // รับแผนกจาก URL parameter
-        const usersSnapshot = await db.collection('users').where('department', '==', department).get(); // ดึงข้อมูลผู้ใช้ตามแผนก
-
-        if (usersSnapshot.empty) {
-            res.status(404).json({ message: 'No users found in this department' }); // ถ้าไม่พบผู้ใช้ในแผนกนี้
-            return;
-        }
-
-        const users = [];
-        
-        for (const doc of usersSnapshot.docs) {
-            const userData = doc.data();
-            userData.id = doc.id; // เพิ่ม ID ของผู้ใช้
-            
-            // // ดึงข้อมูลที่อยู่
-            // const addressSnapshot = await doc.ref.collection('address').get();
-            // const addressData = addressSnapshot.docs.map(addressDoc => addressDoc.data());
-            // userData.address = addressData; // เพิ่มที่อยู่เข้าไปในข้อมูลผู้ใช้
-            
-            users.push(userData); // เพิ่มผู้ใช้ลงใน array
-        }
-
-        res.json(users); // ส่งข้อมูลผู้ใช้กลับไป
+      const department = req.params.department; // Get department from URL parameter
+      const usersSnapshot = await db.collection('users').where('department', '==', department).get(); // Fetch users by department
+  
+      if (usersSnapshot.empty) {
+        res.status(404).json({ message: 'No users found in this department' });
+        return;
+      }
+  
+      const users = [];
+  
+      for (const doc of usersSnapshot.docs) {
+        const userData = doc.data();
+        userData.id = doc.id; // Add user ID
+        userData.birthdate = fc.formatDate(userData.birthdate); // Format birthdate
+        userData.age = fc.calculateAge(userData.birthdate); // Calculate and add age
+  
+        users.push(userData); // Add user data to array
+      }
+  
+      res.json(users); // Send users data
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error getting users by department: ' + error.message }); // ข้อความข้อผิดพลาด
+      console.error(error);
+      res.status(500).json({ message: 'Error getting users by department: ' + error.message });
     }
-};
+  };
 
 
 
