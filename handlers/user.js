@@ -55,8 +55,9 @@ module.exports.createUser = async (req, res) => {
 };
 module.exports.uploadProfile = async (req, res) => {
     try {
+        console.log("uploading...",req.body);
         const userId = req.body.uid; // ID ของผู้ใช้
-        const folder = req.body.folder || 'profile'; // โฟลเดอร์ที่จะเก็บรูปภาพโปรไฟล์
+        // const folder = req.body.folder || 'profile'; // โฟลเดอร์ที่จะเก็บรูปภาพโปรไฟล์
         const userRef = db.collection('users').doc(userId); // อ้างอิงไปยังเอกสารผู้ใช้
 
         // ตรวจสอบว่าผู้ใช้มีอยู่จริงหรือไม่
@@ -72,8 +73,8 @@ module.exports.uploadProfile = async (req, res) => {
 
         // อัปเดตโปรไฟล์ผู้ใช้ด้วย URL ของรูปภาพ
         await userRef.update({ profilePicture: imageUrl });
-
-        res.json({ message: 'Profile updated successfully', imageUrl: imageUrl });
+        console.log('Profile uploaded successfully');
+        res.json({ message: 'Profile uploaded successfully', imageUrl: imageUrl });
     } catch (error) {
         console.error('Error uploading profile:', error);
         res.status(500).json({ message: 'Error uploading profile' });
