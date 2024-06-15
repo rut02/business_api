@@ -128,6 +128,7 @@ module.exports.getCompanyById = async (req, res) => {
         // companyData.address = addressData;
 
         // ส่งข้อมูลบริษัทกลับไปยัง client
+        console.log(companyData);
         res.json(companyData);
     } catch (error) {
         console.error(error);
