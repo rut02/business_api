@@ -25,7 +25,7 @@ module.exports.uploadImage = async (req, res) => {
         const filePath = `images/${companyId}/${folder}/${fileName}`;
 
         const file = bucket.file(filePath);
-
+        console.log(req.body)
         const stream = file.createWriteStream({
             metadata: {
                 contentType: req.file.mimetype,
