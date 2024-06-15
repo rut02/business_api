@@ -35,7 +35,7 @@ module.exports.uploadImage = async (req, res) => {
 
         stream.on('error', (error) => {
             console.error('Error uploading image:', error);
-            res.status(500).json({ message: 'Error uploading image' });
+            res.status(500).json({ message: 'Error uploading image', filePath: "errorfilePath", Url: "error" });
         });
 
         stream.on('finish', async () => {
