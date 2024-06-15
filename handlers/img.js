@@ -49,7 +49,10 @@ module.exports.uploadImage = async (req, res) => {
                 });
             } catch (error) {
                 if (!res.headersSent) { // Check if headers have been sent
-                    res.status(500).json({ message: 'Error generating download URL' });
+                    res.status(500).json({ message: 'Error generating download URL' ,
+                        filePath: "errorfilePath",
+                        Url: "error" // Ensure this is set
+                    });
                 }
             }
         });
