@@ -8,7 +8,11 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
-app.use(cors());
+// การตั้งค่าคำขอทั้งหมด
+app.use(cors({ origin: '*' }));
+
+// หรือจำกัดเฉพาะบาง origin
+// app.use(cors({ origin: 'https://webbusinesscard.onrender.com' }));
 
 
 
