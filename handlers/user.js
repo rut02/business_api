@@ -70,7 +70,7 @@ module.exports.uploadProfile = async (req, res) => {
         // อัปโหลดรูปภาพและรับ URL ที่เซ็นชื่อแล้ว
         const uploadRes = await imgController.uploadImage(req, res);
         console.log(uploadRes);
-        const imageUrl = uploadRes.Url; // รับ URL ของรูปภาพที่อัปโหลด
+        const imageUrl = uploadRes['Url']; // รับ URL ของรูปภาพที่อัปโหลด
 
         // อัปเดตโปรไฟล์ผู้ใช้ด้วย URL ของรูปภาพ
         await userRef.update({ profilePicture: imageUrl });
