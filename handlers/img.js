@@ -19,13 +19,14 @@ const getSignedUrl = async (filePath) => {
 
 module.exports.uploadImage = async (req, res) => {
     try {
+        console.log("uploading...")
         const companyId = req.body.uid;
         const folder = req.body.folder;
         const fileName = `${companyId}_${req.file.originalname}`;
         const filePath = `images/${companyId}/${folder}/${fileName}`;
 
         const file = bucket.file(filePath);
-        console.log(req.body)
+        console.log("req",req.body)
         const stream = file.createWriteStream({
             metadata: {
                 contentType: req.file.mimetype,
