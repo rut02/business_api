@@ -19,6 +19,7 @@ module.exports.createUser = async (req, res) => {
         if (existingEmails.size > 0) {
             res.status(400).json({ message: 'Email already exists. Please choose a different email.' });
             console.log("existingEmails");
+            console.log(existingEmails.size);
             return;
         }
 
