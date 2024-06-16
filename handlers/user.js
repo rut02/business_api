@@ -53,34 +53,7 @@ module.exports.createUser = async (req, res) => {
         res.status(500).json({ message: 'Error creating user: ' + error.message });
     }
 };
-module.exports.uploadProfile = async (req, res) => {
-    try {
-        console.log("uploading...",req.body);
-        const userId = req.body.uid; // ID ของผู้ใช้
-        // const folder = req.body.folder || 'profile'; // โฟลเดอร์ที่จะเก็บรูปภาพโปรไฟล์
-        const userRef = db.collection('users').doc(userId); // อ้างอิงไปยังเอกสารผู้ใช้
 
-        // ตรวจสอบว่าผู้ใช้มีอยู่จริงหรือไม่
-        const userSnapshot = await userRef.get();
-        if (!userSnapshot.exists) {
-            res.status(404).json({ message: 'User not found' });
-            return;
-        }
-
-        // อัปโหลดรูปภาพและรับ URL ที่เซ็นชื่อแล้ว
-        const uploadRes = await imgController.uploadImage(req, res);
-        console.log(uploadRes);
-        const imageUrl = uploadRes['Url']; // รับ URL ของรูปภาพที่อัปโหลด
-
-        // อัปเดตโปรไฟล์ผู้ใช้ด้วย URL ของรูปภาพ
-        await userRef.update({ profilePicture: imageUrl });
-        console.log('Profile uploaded successfully');
-        res.json({ message: 'Profile uploaded successfully', imageUrl: imageUrl });
-    } catch (error) {
-        console.error('Error uploading profile:', error);
-        res.status(500).json({ message: 'Error uploading profile' });
-    }
-};
 module.exports.getUsers = async (req, res) => {
     try {
       const usersSnapshot = await db.collection('users').get(); // Fetch all users
@@ -123,6 +96,48 @@ module.exports.getUsers = async (req, res) => {
       res.status(500).json({ message: 'Error retrieving user: ' + error.message });
     }
   };
+  module.exports.getUsersByCompany = async (req, res) => {
+    try {
+        const companyId = req.params.companyId; // รับ companyId จาก URL parameters
+        
+        // ดึง companybranchid ทั้งหมดที่เกี่ยวข้องกับ companyId นี้
+        const companyBranchesSnapshot = await db.collection('companybranch').where('companyid', '==', companyId).get();
+
+        if (companyBranchesSnapshot.empty) {
+            res.status(404).json({ message: 'No company branches found for this company ID' });
+            return;
+        }
+
+        const companyBranchIds = companyBranchesSnapshot.docs.map(doc => doc.id); // เก็บ companybranchid
+
+        if (companyBranchIds.length === 0) {
+            res.status(404).json({ message: 'No users found for this company' });
+            return;
+        }
+
+        // ดึงผู้ใช้ทั้งหมดที่มี companybranchid อยู่ใน companyBranchIds
+        const usersSnapshot = await db.collection('users').where('companybranch', 'in', companyBranchIds).get();
+
+        if (usersSnapshot.empty) {
+            res.status(404).json({ message: 'No users found for this company' });
+            return;
+        }
+
+        const users = usersSnapshot.docs.map(doc => {
+            const userData = doc.data();
+            userData.id = doc.id; // เพิ่ม user ID
+            userData.birthdate = fc.formatDate(userData.birthdate); // จัดรูปแบบ birthdate
+            userData.age = fc.calculateAge(userData.birthdate); // คำนวณและเพิ่มอายุ
+
+            return userData;
+        });
+
+        res.json(users); // ส่งข้อมูลผู้ใช้
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error getting users by company: ' + error.message });
+    }
+};
   module.exports.getUsersByCompanyBranch = async (req, res) => {
     try {
       const companyBranch = req.params.branch; // Get company branch from URL parameter

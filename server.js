@@ -38,7 +38,7 @@ app.delete('/companies/:id',companyController.deleteCompany);
 
 const userController = require('./handlers/user');
 app.post('/users',userController.createUser);
-app.post('/upload-profile', upload.single('file'), userController.uploadProfile); // ฟังก์ชันที่จะอัปเดตโปรไฟล์พร้อมกับอัปโหลดรูปภาพ
+// app.post('/upload-profile', upload.single('file'), userController.uploadProfile); // ฟังก์ชันที่จะอัปเดตโปรไฟล์พร้อมกับอัปโหลดรูปภาพ
 app.get('/users', userController.getUsers); // ดึงข้อมูลผู้ใช้ทั้งหมด
 app.get('/users/:id', userController.getUserById); // ดึงข้อมูลผู้ใช้ตาม ID
 app.get('/users/by-department/:department', userController.getUsersByDepartment); // ดึงข้อมูลผู้ใช้ตามแผนก
@@ -53,6 +53,7 @@ app.post('/companybranches', companyBranchController.createCompanybranch); // �
 app.get('/companybranches', companyBranchController.getCompanybranches); // ดึงข้อมูลสาขาทั้งหมด
 app.get('/companybranches/:id', companyBranchController.getCompanybranchById); // ดึงข้อมูลสาขาตาม ID
 app.get('/companybranches/by-company/:companyID', companyBranchController.getCompanybranchesByCompanyID); // ดึงข้อมูลสาขาตาม CompanyID
+app.get('/users/company/:companyId', userController.getUsersByCompany);
 app.put('/companybranches/:id', companyBranchController.updateCompanybranch); // อัปเดตสาขา
 app.delete('/companybranches/:id', companyBranchController.deleteCompanybranch); // ลบสาขา
 
@@ -67,7 +68,7 @@ app.delete('/departments/:id', departmentController.deleteDepartment); // ลบ
 
 const imgController = require('./handlers/img');
 
-app.post('/upload', upload.single('file'), imgController.uploadImage);
+app.post('/upload-image', upload.single('file'), imgController.insert_img);
 
 
 const templateController = require('./handlers/template');
