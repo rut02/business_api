@@ -19,64 +19,59 @@ const getSignedUrl = async (filePath) => {
 
 // img.js
 
+// ฟังก์ชันอัปโหลดภาพและรับ URL ที่เซ็นชื่อแล้ว
 const uploadImage = async (req) => {
     try {
-        console.log("uploading...");
-        const companyId = req.body.uid;
-        const folder = req.body.folder;
-        const fileName = `${companyId}_${req.file.originalname}`;
-        const filePath = `images/${companyId}/${folder}/${fileName}`;
+        const { file, uid, folder, collection } = req.body;
 
-        const file = bucket.file(filePath);
-        console.log("req", req.body);
-        const stream = file.createWriteStream({
-            metadata: {
-                contentType: req.file.mimetype,
-            },
+        // เส้นทางไฟล์ใน Storage
+        const fileName = `${uid}_${Date.now()}.png`;
+        const filePath = `images/${uid}/${folder}/${fileName}`;
+        const fileRef = bucket.file(filePath);
+
+        // อัปโหลดไฟล์
+        const buffer = Buffer.from(file, 'base64');
+        await fileRef.save(buffer, {
+            metadata: { contentType: 'image/png' },
         });
 
-        // ใช้ Promise เพื่อจัดการการทำงานแบบอะซิงโครนัสของ WriteStream
-        return new Promise((resolve, reject) => {
-            stream.on('error', (error) => {
-                console.log("e1");
-                console.error('Error uploading image:', error);
-                reject({ message: 'Error uploading image', filePath: "errorfilePath", Url: "error" });
-            });
-
-            stream.on('finish', async () => {
-                console.log('Upload finished');
-                try {
-                    const signedUrl = await getSignedUrl(filePath);
-                    console.log("E2");
-                    resolve({
-                        message: 'File uploaded successfully',
-                        filePath: filePath,
-                        Url: signedUrl // ส่งคืน URL
-                    });
-                } catch (error) {
-                    console.log("e3", error);
-                    console.error('Error generating download URL:', error);
-                    reject({ message: 'Error generating download URL', filePath: "errorfilePath", Url: "error" });
-                }
-            });
-
-            stream.end(req.file.buffer); // สิ้นสุด WriteStream และอัปโหลดไฟล์
+        // รับ URL ที่เซ็นชื่อแล้ว
+        const [signedUrl] = await fileRef.getSignedUrl({
+            action: 'read',
+            expires: '01-01-2025',
         });
 
+        return { Url: signedUrl, filePath };
     } catch (error) {
-        console.error('Error in uploadImage:', error);
-        throw new Error('Error uploading image');
+        console.error('Error uploading image:', error);
+        throw error;
+    }
+};
+
+// ฟังก์ชันลบภาพที่มีอยู่ในโฟลเดอร์
+const deleteExistingImages = async (uid, folder) => {
+    try {
+        const prefix = `images/${uid}/${folder}/`;
+        const [files] = await bucket.getFiles({ prefix });
+
+        if (files.length > 0) {
+            console.log(`Deleting ${files.length} files in folder: ${prefix}`);
+            await Promise.all(files.map(file => file.delete()));
+        }
+    } catch (error) {
+        console.error('Error deleting existing images:', error);
+        throw error;
     }
 };
 
 module.exports.insert_img = async (req, res) => {
     try {
-        console.log("uploading...",req.body);
-        const userId = req.body.uid; // ID ของผู้ใช้
-        const field = req.body.folder || 'profile'; // โฟลเดอร์ที่จะเก็บรูปภาพโปรไฟล์
+        console.log("Uploading...", req.body);
+        const userId = req.body.uid;
+        const field = req.body.folder || 'profile';
         const collection = req.body.collection || 'users';
-        const userRef = db.collection(collection).doc(userId); // อ้างอิงไปยังเอกสารผู้ใช้
-        console.log(field);
+        const userRef = db.collection(collection).doc(userId);
+
         // ตรวจสอบว่าผู้ใช้มีอยู่จริงหรือไม่
         const userSnapshot = await userRef.get();
         if (!userSnapshot.exists) {
@@ -84,15 +79,18 @@ module.exports.insert_img = async (req, res) => {
             return;
         }
 
-        // อัปโหลดรูปภาพและรับ URL ที่เซ็นชื่อแล้ว
-        const uploadRes = await uploadImage(req, res);
-        console.log("uploadRes",uploadRes);
-        const imageUrl = uploadRes.Url; // รับ URL ของรูปภาพที่อัปโหลด  
+        // ลบภาพที่มีอยู่ในโฟลเดอร์
+        await deleteExistingImages(userId, field);
 
-        // อัปเดตโปรไฟล์ผู้ใช้ด้วย URL ของรูปภาพ
-        const gg = {
-            [field]: imageUrl,}
-        await userRef.update(gg);
+        // อัปโหลดภาพใหม่และรับ URL ที่เซ็นชื่อแล้ว
+        const uploadRes = await uploadImage(req);
+        const imageUrl = uploadRes.Url;
+        console.log("UploadRes", uploadRes);
+
+        // อัปเดตโปรไฟล์ผู้ใช้ด้วย URL ของภาพ
+        const updateData = { [field]: imageUrl };
+        await userRef.update(updateData);
+
         console.log('Profile uploaded successfully');
         res.json({ message: 'Profile uploaded successfully', imageUrl: imageUrl });
     } catch (error) {
@@ -100,4 +98,3 @@ module.exports.insert_img = async (req, res) => {
         res.status(500).json({ message: 'Error uploading profile' });
     }
 };
-

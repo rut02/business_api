@@ -73,13 +73,24 @@ async function createBusinessCard(data) {
     await browser.close();
     fs.unlinkSync(tempHtmlPath);
 
-    const uploadResult = await uploadImage(imagePath, data.id);
+    const uploadResult = await uploadImage(imagePath, data.uid);
     console.log('Upload result:', uploadResult);
 }
 
-// API URL
-const apiUrl = 'https://business-api-638w.onrender.com/users/EhYnE4DXS7tDhFyQgqnP';
+// Main function to handle user input and call other functions
+module.exports.genCard = async (req, res) => {
 
-fetchData(apiUrl).then(data => {
-    createBusinessCard(data).then(() => console.log('Business card created.'));
-});
+    const uid = req.body.uid
+    const apiUrl = `https://business-api-638w.onrender.com/users/${uid}`;
+    const data = await fetchData(apiUrl);
+
+    if (data) {
+        await createBusinessCard(data);
+        console.log('Business card created.');
+    } else {
+        console.log('Failed to fetch data or create business card.');
+    }
+}
+
+
+
