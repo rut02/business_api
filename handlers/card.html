@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Card</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            width: 600px; /* ปรับขนาดตามตัวอย่าง */
+            height: 300px; /* ปรับขนาดตามตัวอย่าง */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #fff;
+            background-image: url('https://firebasestorage.googleapis.com/v0/b/businesscardonline-cf4c2.appspot.com/o/images%2FOijytZfGzbaPt4UaLwfc%2Ftemplate_1%2FOijytZfGzbaPt4UaLwfc_bg?alt=media&token=ccb3ac19-2bbc-4276-973d-eeb147c42157');
+            background-size: cover;
+        }
+        .card {
+            background-color: white;
+            width: 580px; /* ปรับขนาดตามตัวอย่าง */
+            height: 280px; /* ปรับขนาดตามตัวอย่าง */
+            padding: 20px;
+            display: flex;
+            flex-direction: row;
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            position: relative;
+        }
+        .profile {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+        .info {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .name-title {
+            margin-bottom: 10px;
+        }
+        .name {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #333;
+        }
+        .title {
+            font-size: 1.1em;
+            color: #555;
+        }
+        .details {
+            font-size: 0.9em;
+            color: #333;
+        }
+        .details div {
+            margin: 2px 0;
+        }
+        .contact {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        .contact div {
+            width: 45%;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="profile" style="background-image: url('{{PROFILE}}');"></div>
+        <div class="info">
+            <div class="name-title">
+                <div class="name">{{FIRSTNAME}} {{LASTNAME}}</div>
+                <div class="title">{{POSITION}}</div>
+            </div>
+            <div class="details">
+                <div>Birthdate: {{BIRTHDATE}}</div>
+                <div>Gender: {{GENDER}}</div>
+            </div>
+            <div class="contact">
+                <div>Phone: {{PHONE}}</div>
+                <div>Email: {{EMAIL}}</div>
+            </div>
+            <div class="details">
+                <div>Address: {{ADDRESS}}</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
