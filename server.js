@@ -129,4 +129,4 @@ const loginController = require('./handlers/login');
 app.post('/login', loginController.login); // เข้าสู่ระบบ
 
 const gen_cardcontroller = require('./handlers/gen_card');
-app.post('/gen_card', gen_cardcontroller.gen_card); // สร้างบัตร
+app.post('/gen_card', gen_cardcontroller.genCard); // สร้างบัตร
