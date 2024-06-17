@@ -9,11 +9,15 @@ app.use(express.urlencoded({ extended: true }));
 
 
 // การตั้งค่าคำขอทั้งหมด
-app.use(cors({ origin: '*' }));
+
 
 // หรือจำกัดเฉพาะบาง origin
 // app.use(cors({ origin: 'https://webbusinesscard.onrender.com' }));
-
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
+}));
 
 
 app.get('/', (req, res) => {
