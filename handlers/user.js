@@ -78,6 +78,7 @@ module.exports.getUsers = async (req, res) => {
 
   module.exports.getUserById = async (req, res) => {
     try {
+      console.log("getUserById");
       const userId = req.params.id; // Get user ID from URL parameters
       const userDoc = await db.collection('users').doc(userId).get(); // Fetch user document
   

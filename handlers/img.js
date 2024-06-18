@@ -22,15 +22,16 @@ const getSignedUrl = async (filePath) => {
 // ฟังก์ชันอัปโหลดภาพและรับ URL ที่เซ็นชื่อแล้ว
 const uploadImage = async (req) => {
     try {
-        const { file, uid, folder, collection } = req.body;
-
+        const {  uid, folder, collection } = req.body;
+        console.log("body",req.file);
+        const file = req.file;
         // เส้นทางไฟล์ใน Storage
         const fileName = `${uid}_${Date.now()}.png`;
         const filePath = `images/${uid}/${folder}/${fileName}`;
         const fileRef = bucket.file(filePath);
-
+        console.log("file chk",file);
         // อัปโหลดไฟล์
-        const buffer = Buffer.from(file, 'base64');
+        const buffer = file.buffer;
         await fileRef.save(buffer, {
             metadata: { contentType: 'image/png' },
         });
