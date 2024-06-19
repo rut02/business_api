@@ -6,7 +6,8 @@ module.exports.createCompanybranch = async (req, res) => {
     try {
         const companybranchData = {
             name: req.body.name,
-            companyID: req.body.companyID
+            companyID: req.body.companyID,
+            address: req.body.subdistrict+","+req.body.district+","+req.body.province+","+req.body.country,
         };
         const companybranchDocRef = await db.collection('companybranches').add(companybranchData);
         res.json({ message: 'Companybranch created successfully', companybranchId: companybranchDocRef.id });
@@ -92,7 +93,8 @@ module.exports.updateCompanybranch = async (req, res) => {
         
         const updatedData = {
             name: req.body.name,
-            companyID: req.body.companyID
+            companyID: req.body.companyID,
+            address: req.body.subdistrict+","+req.body.district+","+req.body.province+","+req.body.country,
         };
 
         await branchRef.update(updatedData); // อัปเดตข้อมูลของสาขา

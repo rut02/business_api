@@ -7,6 +7,7 @@ module.exports.createDepartment = async (req, res) => {
         const departmentData = {
             name: req.body.name,
             companyID: req.body.companyID,
+            phone: req.body.phone,
         };
 
         const departmentDocRef = await db.collection('departments').add(departmentData);
@@ -81,6 +82,7 @@ module.exports.updateDepartment = async (req, res) => {
         const updatedData = {
             name: req.body.name,
             companyID: req.body.companyID,
+            phone: req.body.phone,
         };
 
         await departmentRef.update(updatedData); // อัปเดตข้อมูลแผนก

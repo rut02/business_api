@@ -113,7 +113,7 @@ async function createBusinessCard(data) {
 module.exports.genCard = async (req, res) => {
     try {
         const uid = req.body.uid;
-        const apiUrl = api+'/users/${uid}';
+        const apiUrl = api+'/users/'+uid;
         const data = await fetchData(apiUrl);
 
         if (data) {

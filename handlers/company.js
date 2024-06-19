@@ -33,10 +33,10 @@ module.exports.createCompany = async (req, res) => {
             name: req.body.name,
             website: req.body.website,
             yearFounded: yearFounded,
-            phoneNumber: req.body.phoneNumber,
+            logo: req.body.logo,            
             email: req.body.email,
             password: password,
-            address: req.body.subdistrict+","+req.body.district+","+req.body.province+","+req.body.country,
+            
         };
 
         console.log(companyData);
@@ -54,7 +54,8 @@ module.exports.createCompany = async (req, res) => {
             await companyBranch.createbranch({
                 body: {
                     name: "สาขาที่ 1",
-                    companyID: companyDocRef.id // ใช้ ID ของบริษัทที่สร้าง
+                    companyID: companyDocRef.id, // ใช้ ID ของบริษัทที่สร้าง
+                    address: req.body.subdistrict+","+req.body.district+","+req.body.province+","+req.body.country,
                 }
             }, res);
         
@@ -194,8 +195,9 @@ module.exports.updateCompany = async (req, res) => {
             name: req.body.name,
             website: req.body.website,
             yearFounded: new Date(req.body.yearFounded),
-            phoneNumber: req.body.phoneNumber,
-            address: req.body.subdistrict+","+req.body.district+","+req.body.province+","+req.body.country,
+            logo: req.body.logo,
+            
+            
         };
 
         // ทำการอัปเดตข้อมูลบริษัทใน Firestore
