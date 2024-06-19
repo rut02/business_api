@@ -156,31 +156,31 @@ async function fetchData(url) {
 // }
 
 
-// // Main function to handle user input and call other functions
-// module.exports.genCard = async (req, res) => {
-//     try {
-//         const uid = req.body.uid;
-//         const apiUrl = api+'/users/'+uid;
-//         const data = await fetchData(apiUrl);
+// Main function to handle user input and call other functions
+module.exports.genCard = async (req, res) => {
+    try {
+        const uid = req.body.uid;
+        const apiUrl = api+'/users/'+uid;
+        const data = await fetchData(apiUrl);
 
-//         if (data) {
-//             await createBusinessCard(data);
-//             console.log('Business card created.');
-//             // const updateResult = await updateBusinessCard(data.businessCard, data.id);
-//             // console.log('Update result:', updateResult);
-//             // if (!updateResult) {
-//             //     throw new Error('Failed to update business card');
-//             // }
-//             res.status(200).send('Business card created.');
-//         } else {
-//             console.log('Failed to fetch data or create business card.');
-//             res.status(500).send('Failed to fetch data or create business card.');
-//         }
-//     } catch (error) {
-//         console.error('Error:', error);
-//         res.status(500).send('Internal Server Error');
-//     }
-// };
+        if (data) {
+            await createBusinessCard(data);
+            console.log('Business card created.');
+            // const updateResult = await updateBusinessCard(data.businessCard, data.id);
+            // console.log('Update result:', updateResult);
+            // if (!updateResult) {
+            //     throw new Error('Failed to update business card');
+            // }
+            res.status(200).send('Business card created.');
+        } else {
+            console.log('Failed to fetch data or create business card.');
+            res.status(500).send('Failed to fetch data or create business card.');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send('Internal Server Error');
+    }
+};
 const updateBusinessCard = async (imageUrl, userId) => {
     try {
         const userRef = db.collection('users').doc(userId);
