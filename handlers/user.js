@@ -65,6 +65,7 @@ module.exports.getUsers = async (req, res) => {
         userData.id = doc.id; // Add user ID
         userData.birthdate = fc.formatDate(userData.birthdate); // Format birthdate
         userData.age = fc.calculateAge(userData.birthdate); // Calculate and add age
+        
   
         users.push(userData); // Add user data to array
       }
