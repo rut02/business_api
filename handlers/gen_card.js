@@ -83,7 +83,10 @@ async function createBusinessCard(data) {
     let browser;
 
     try {
-        browser = await puppeteer.launch({ headless: true , args: ['--no-sandbox', '--disable-setuid-sandbox'], });
+        let browser = await puppeteer.launch({
+            headless: true,
+            args: ['--no-sandbox', '--disable-setuid-sandbox'],
+        });
         const page = await browser.newPage();
         await page.goto(`file://${tempHtmlPath}`, { waitUntil: 'networkidle0' });
         await page.setViewport({ width: 600, height: 300 });
