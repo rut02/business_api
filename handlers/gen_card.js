@@ -5,8 +5,46 @@ const path = require('path');
 const FormData = require('form-data');
 const admin = require('../admin.js');
 const db = admin.firestore();
-const api = "https://business-api-638w.onrender.com";
+const api ="https://business-api-638w.onrender.com";
+// Fetch data from API
+async function fetchData(url) {
+    try {
+        const response = await axios.get(url);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching data:', error.message);
+        return null;
+    }
+}
 
+// Upload image to server
+async function uploadImage(filePath, userId) {
+    try {console.log('test');
+        const form = new FormData();
+        form.append('file', fs.createReadStream(filePath));
+        form.append('uid', userId);
+        form.append('folder', 'business_cards');
+        form.append('collection', 'users');
+        
+        const response = await axios.post(api+'/upload-image', form, {
+            headers: {
+                ...form.getHeaders()
+            }
+        });
+
+        console.log("response.data",response.data);
+        if (response.data && response.data.imageUrl) {
+            return response.data;
+        } else {
+            throw new Error('Failed to get upload URL');
+        }
+    } catch (error) {
+        console.error('Error uploading image:', error.message);
+        return null;
+    }
+}
+
+// Create business card from data
 async function createBusinessCard(data) {
     if (!data) {
         console.log('No valid data to create the card.');
@@ -45,10 +83,7 @@ async function createBusinessCard(data) {
     let browser;
 
     try {
-        browser = await puppeteer.launch({
-            headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox']
-        });
+        browser = await puppeteer.launch({ headless: true });
         const page = await browser.newPage();
         await page.goto(`file://${tempHtmlPath}`, { waitUntil: 'networkidle0' });
         await page.setViewport({ width: 600, height: 300 });
@@ -73,40 +108,22 @@ async function createBusinessCard(data) {
     }
 }
 
-async function uploadImage(filePath, userId) {
-    try {
-        const form = new FormData();
-        form.append('file', fs.createReadStream(filePath));
-        form.append('uid', userId);
-        form.append('folder', 'business_cards');
-        form.append('collection', 'users');
 
-        const response = await axios.post(api + '/upload-image', form, {
-            headers: {
-                ...form.getHeaders()
-            }
-        });
-
-        if (response.data && response.data.imageUrl) {
-            return response.data;
-        } else {
-            throw new Error('Failed to get upload URL');
-        }
-    } catch (error) {
-        console.error('Error uploading image:', error.message);
-        return null;
-    }
-}
-
+// Main function to handle user input and call other functions
 module.exports.genCard = async (req, res) => {
     try {
         const uid = req.body.uid;
-        const apiUrl = api + '/users/' + uid;
+        const apiUrl = api+'/users/'+uid;
         const data = await fetchData(apiUrl);
 
         if (data) {
             await createBusinessCard(data);
             console.log('Business card created.');
+            // const updateResult = await updateBusinessCard(data.businessCard, data.id);
+            // console.log('Update result:', updateResult);
+            // if (!updateResult) {
+            //     throw new Error('Failed to update business card');
+            // }
             res.status(200).send('Business card created.');
         } else {
             console.log('Failed to fetch data or create business card.');
@@ -117,17 +134,6 @@ module.exports.genCard = async (req, res) => {
         res.status(500).send('Internal Server Error');
     }
 };
-
-async function fetchData(url) {
-    try {
-        const response = await axios.get(url);
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching data:', error.message);
-        return null;
-    }
-}
-
 const updateBusinessCard = async (imageUrl, userId) => {
     try {
         const userRef = db.collection('users').doc(userId);
@@ -142,9 +148,12 @@ const updateBusinessCard = async (imageUrl, userId) => {
         });
 
         console.log('Business card updated successfully');
-        return true;
+        return true; // ส่งคืนสถานะสำเร็จ
     } catch (error) {
         console.error('Error updating business card:', error.message);
-        return false;
+        return false; // ส่งคืนสถานะล้มเหลว
     }
 };
+
+
+
