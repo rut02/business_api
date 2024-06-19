@@ -1,11 +1,13 @@
 const fs = require('fs');
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-core');
 const axios = require('axios');
 const path = require('path');
 const FormData = require('form-data');
 const admin = require('../admin.js');
 const db = admin.firestore();
 const api ="https://business-api-638w.onrender.com";
+// const puppeteer = require('puppeteer-core'); // ใช้ puppeteer-core แทน puppeteer ถ้าใช้ Chrome ที่ติดตั้งเอง
+
 // Fetch data from API
 async function fetchData(url) {
     try {
@@ -44,22 +46,16 @@ async function uploadImage(filePath, userId) {
     }
 }
 
-// Create business card from data
-async function createBusinessCard(data) {
+// const puppeteer = require('puppeteer-core'); // ใช้ puppeteer-core แทน puppeteer ถ้าใช้ Chrome ที่ติดตั้งเอง
+
+const createBusinessCard = async (data) => {
     if (!data) {
         console.log('No valid data to create the card.');
         return;
     }
 
     const templatePath = path.join(__dirname, 'card.html');
-    let template;
-
-    try {
-        template = fs.readFileSync(templatePath, 'utf8');
-    } catch (err) {
-        console.error('Error reading template:', err);
-        return;
-    }
+    let template = fs.readFileSync(templatePath, 'utf8');
 
     template = template.replace('{{PROFILE}}', data.profile || '');
     template = template.replace('{{FIRSTNAME}}', data.firstname || 'Unknown');
@@ -72,41 +68,27 @@ async function createBusinessCard(data) {
     template = template.replace('{{ADDRESS}}', data.address || 'Unknown Address');
 
     const tempHtmlPath = path.join(__dirname, 'temp-card.html');
+    fs.writeFileSync(tempHtmlPath, template, 'utf8');
 
-    try {
-        fs.writeFileSync(tempHtmlPath, template, 'utf8');
-    } catch (err) {
-        console.error('Error writing temp HTML:', err);
-        return;
-    }
+    const browser = await puppeteer.launch({
+        executablePath: '/path/to/your/chrome', // ระบุเส้นทางไปยัง Chrome ที่ติดตั้ง
+        args: ['--no-sandbox', '--disable-setuid-sandbox'] // สำหรับการรันในสภาพแวดล้อมที่จำกัด
+    });
 
-    let browser;
+    const page = await browser.newPage();
+    await page.goto(`file://${tempHtmlPath}`, { waitUntil: 'networkidle0' });
+    await page.setViewport({ width: 600, height: 300 });
 
-    try {
-        browser = await puppeteer.launch({ headless: true });
-        const page = await browser.newPage();
-        await page.goto(`file://${tempHtmlPath}`, { waitUntil: 'networkidle0' });
-        await page.setViewport({ width: 600, height: 300 });
+    const buffer = await page.screenshot({ type: 'png' });
+    const imagePath = './business-card.png';
+    fs.writeFileSync(imagePath, buffer);
 
-        const buffer = await page.screenshot({ type: 'png' });
-        const imagePath = path.join(__dirname, 'business-card.png');
-        fs.writeFileSync(imagePath, buffer);
+    await browser.close();
+    fs.unlinkSync(tempHtmlPath);
 
-        await browser.close();
-
-        const uploadResult = await uploadImage(imagePath, data.id);
-        console.log('Upload result:', uploadResult);
-    } catch (err) {
-        console.error('Error generating card or uploading image:', err);
-    } finally {
-        if (browser) {
-            await browser.close();
-        }
-        if (fs.existsSync(tempHtmlPath)) {
-            fs.unlinkSync(tempHtmlPath);
-        }
-    }
-}
+    const uploadResult = await uploadImage(imagePath, data.uid);
+    console.log('Upload result:', uploadResult);
+};
 
 
 // Main function to handle user input and call other functions
