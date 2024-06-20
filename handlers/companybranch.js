@@ -21,7 +21,7 @@ module.exports.createbranch = async (req, res) => {
         const companybranchData = {
             name: req.body.name,
             companyID: req.body.companyID,
-            address: req.body.subdistrict+","+req.body.district+","+req.body.province+","+req.body.country,
+            address: req.body.address,
         };
         const companybranchDocRef = await db.collection('companybranches').add(companybranchData);
         // res.json({ message: 'Companybranch created successfully', companybranchId: companybranchDocRef.id });
