@@ -45,6 +45,7 @@ app.post('/users',userController.createUser);
 // app.post('/upload-profile', upload.single('file'), userController.uploadProfile); // ฟังก์ชันที่จะอัปเดตโปรไฟล์พร้อมกับอัปโหลดรูปภาพ
 app.get('/users', userController.getUsers); // ดึงข้อมูลผู้ใช้ทั้งหมด
 app.get('/users/by-company/:company',userController.getUsersByCompany)//
+app.get('/users/by-companyandposition/:company/:position', userController.getUsersByCompany_position);
 app.get('/users/:id', userController.getUserById); // ดึงข้อมูลผู้ใช้ตาม ID
 app.get('/users/by-department/:department', userController.getUsersByDepartment); // ดึงข้อมูลผู้ใช้ตามแผนก
 app.get('/users/by-companybranch/:branch', userController.getUsersByCompanyBranch); // ดึงข้อมูลผู้ใช้ตามสาขาของบริษัท

@@ -141,6 +141,63 @@ module.exports.getUsers = async (req, res) => {
         res.status(500).json({ message: 'Error getting users by company: ' + error.message });
     }
 };
+module.exports.getUsersByCompany_position = async (req, res) => {
+  try {
+      const companyId = req.params.company; // รับ companyId จาก URL parameters
+      const position = req.params.position; // รับตำแหน่งจาก URL parameters
+      console.log(`Company ID: ${companyId}, Position: ${position}`);
+      
+      // ดึง companybranchid ทั้งหมดที่เกี่ยวข้องกับ companyId นี้
+      const companyBranchesSnapshot = await db.collection('companybranches')
+                                              .where('companyID', '==', companyId)
+                                              .get();
+
+      if (companyBranchesSnapshot.empty) {
+          res.status(404).json({ message: 'ไม่พบสาขาของบริษัทที่ตรงกับ company ID นี้' });
+          return;
+      }
+
+      const companyBranchIds = companyBranchesSnapshot.docs.map(doc => doc.id); // เก็บ companybranchid
+      console.log(companyBranchIds);
+      if (companyBranchIds.length === 0) {
+          res.status(404).json({ message: 'ไม่พบผู้ใช้สำหรับบริษัทนี้' });
+          return;
+      }
+
+      // เริ่มต้น query สำหรับผู้ใช้
+      let usersQuery = db.collection('users').where('companybranch', 'in', companyBranchIds);
+
+      // เพิ่มเงื่อนไขการกรองตำแหน่งถ้ามีการระบุตำแหน่ง
+      if (position === "HR") {
+          usersQuery = usersQuery.where('position', '==', position);
+      } else if (position === "user") {
+          usersQuery = usersQuery.where('position', '!=', "HR");
+      }
+
+      const usersSnapshot = await usersQuery.get();
+
+      if (usersSnapshot.empty) {
+          res.status(404).json({ message: 'ไม่พบผู้ใช้สำหรับบริษัทนี้' });
+          return;
+      }
+
+      const users = usersSnapshot.docs.map(doc => {
+          const userData = doc.data();
+          userData.id = doc.id; // เพิ่ม user ID
+          userData.birthdate = fc.formatDate(userData.birthdate); // จัดรูปแบบ birthdate
+          userData.age = fc.calculateAge(userData.birthdate); // คำนวณและเพิ่มอายุ
+
+          return userData;
+      });
+
+      res.json(users); // ส่งข้อมูลผู้ใช้
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'เกิดข้อผิดพลาดในการดึงข้อมูลผู้ใช้ตามบริษัท: ' + error.message });
+  }
+};
+
+
   module.exports.getUsersByCompanyBranch = async (req, res) => {
     try {
       const companyBranch = req.params.branch; // Get company branch from URL parameter
