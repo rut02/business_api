@@ -67,7 +67,7 @@ const departmentController = require('./handlers/department');
 app.post('/departments', departmentController.createDepartment); // สร้างแผนกใหม่
 app.get('/departments', departmentController.getDepartments); // ดึงข้อมูลแผนกทั้งหมด
 app.get('/departments/:id', departmentController.getDepartmentById); // ดึงข้อมูลแผนกตาม ID
-app.get('/departments/by-company/:companyID', departmentController.getDepartmentsByCompanyID); // ดึงข้อมูลแผนกตาม CompanyID
+app.get('/departments/by-company/:companyId', departmentController.getDepartmentsByCompanyID); // ดึงข้อมูลแผนกตาม CompanyID
 app.put('/departments/:id', departmentController.updateDepartment); // อัปเดตข้อมูลแผนก
 app.delete('/departments/:id', departmentController.deleteDepartment); // ลบแผนกตาม ID
 

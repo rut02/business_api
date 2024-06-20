@@ -102,9 +102,9 @@ module.exports.getUsers = async (req, res) => {
   module.exports.getUsersByCompany = async (req, res) => {
     try {
         const companyId = req.params.company; // รับ companyId จาก URL parameters
-        
+        console.log(companyId)
         // ดึง companybranchid ทั้งหมดที่เกี่ยวข้องกับ companyId นี้
-        const companyBranchesSnapshot = await db.collection('companybranch').where('companyId', '==', companyId).get();
+        const companyBranchesSnapshot = await db.collection('companybranches').where('companyID', '==', companyId).get();
 
         if (companyBranchesSnapshot.empty) {
             res.status(404).json({ message: 'No company branches found for this company ID' });
@@ -112,7 +112,7 @@ module.exports.getUsers = async (req, res) => {
         }
 
         const companyBranchIds = companyBranchesSnapshot.docs.map(doc => doc.id); // เก็บ companybranchid
-
+        console.log(companyBranchIds)
         if (companyBranchIds.length === 0) {
             res.status(404).json({ message: 'No users found for this company' });
             return;
@@ -122,7 +122,7 @@ module.exports.getUsers = async (req, res) => {
         const usersSnapshot = await db.collection('users').where('companybranch', 'in', companyBranchIds).get();
 
         if (usersSnapshot.empty) {
-            res.status(404).json({ message: 'No users found for this company' });
+            res.status(404).json({ message: 'No users found for this companyy' });
             return;
         }
 
