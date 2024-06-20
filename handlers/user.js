@@ -101,7 +101,7 @@ module.exports.getUsers = async (req, res) => {
   };
   module.exports.getUsersByCompany = async (req, res) => {
     try {
-        const companyId = req.params.companyId; // รับ companyId จาก URL parameters
+        const companyId = req.params.company; // รับ companyId จาก URL parameters
         
         // ดึง companybranchid ทั้งหมดที่เกี่ยวข้องกับ companyId นี้
         const companyBranchesSnapshot = await db.collection('companybranch').where('companyid', '==', companyId).get();
