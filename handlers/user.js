@@ -104,7 +104,7 @@ module.exports.getUsers = async (req, res) => {
         const companyId = req.params.company; // รับ companyId จาก URL parameters
         
         // ดึง companybranchid ทั้งหมดที่เกี่ยวข้องกับ companyId นี้
-        const companyBranchesSnapshot = await db.collection('companybranch').where('companyid', '==', companyId).get();
+        const companyBranchesSnapshot = await db.collection('companybranch').where('companyId', '==', companyId).get();
 
         if (companyBranchesSnapshot.empty) {
             res.status(404).json({ message: 'No company branches found for this company ID' });
