@@ -53,7 +53,7 @@ module.exports.getDepartmentById = async (req, res) => {
 };
 module.exports.getDepartmentsByCompanyID = async (req, res) => {
     try {
-        const companyID = req.params.companyID; // รับ CompanyID จาก URL parameter
+        const companyID = req.params.companyId; // รับ CompanyID จาก URL parameter
         const departmentsSnapshot = await db.collection('departments').where('companyID', '==', companyID).get(); // ดึงข้อมูลแผนกตาม CompanyID
 
         if (departmentsSnapshot.empty) {
