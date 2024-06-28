@@ -35,7 +35,7 @@ module.exports.createUser = async (req, res) => {
             birthdate : new Date(req.body.birthdate),
             companybranch :req.body.companybranch||null,
             department : req.body.department||null,
-            positionTemplate : req.body.positionTemplate,
+            // positionTemplate : req.body.positionTemplate,
             phone : req.body.phone,
             position : req.body.position,
             startwork : req.body.startwork||null,
@@ -99,6 +99,80 @@ module.exports.getUsers = async (req, res) => {
       res.status(500).json({ message: 'Error retrieving user: ' + error.message });
     }
   };
+  module.exports.getUserById_all = async (req, res) => {
+    try {
+      console.log("getUserById_v2: Fetching user by ID");
+      const userId = req.params.id;
+      
+      // ดึงข้อมูลผู้ใช้ตาม userId
+      const userDoc = await db.collection('users').doc(userId).get();
+  
+      if (!userDoc.exists) {
+        res.status(404).json({ message: 'ไม่พบผู้ใช้' });
+        return;
+      }
+  
+      const userData = userDoc.data();
+      userData.id = userDoc.id; // เพิ่ม ID ผู้ใช้
+  
+      // ดึงข้อมูล companybranch
+      if (userData.companybranch) {
+        const companyBranchDoc = await db.collection('companybranches').doc(userData.companybranch).get();
+        if (companyBranchDoc.exists) {
+          userData.companybranch = companyBranchDoc.data(); // เพิ่มข้อมูล companybranch
+          userData.companybranch.id = companyBranchDoc.id; // เพิ่ม ID ของ companybranch
+  
+          // ดึงข้อมูล company จาก companyID ใน companybranch
+          if (userData.companybranch.companyID) {
+            const companyDoc = await db.collection('companies').doc(userData.companybranch.companyID).get();
+            if (companyDoc.exists) {
+              userData.companybranch.company = companyDoc.data(); // เพิ่มข้อมูล company
+              userData.companybranch.company.id = companyDoc.id; // เพิ่ม ID ของ company
+
+              if (userData.companybranch.company.yearFounded) {
+                userData.companybranch.company.yearFounded = fc.formatDate(userData.companybranch.company.yearFounded);
+              }
+            } else {
+              userData.companybranch.company = null; // ถ้าไม่พบ company ให้เป็น null
+            }
+          } else {
+            userData.companybranch.company = null; // ถ้าไม่มี companyID ให้เป็น null
+          }
+        } else {
+          userData.companybranch = null; // ถ้าไม่พบ companybranch ให้เป็น null
+        }
+      } else {
+        userData.companybranch = null; // ถ้าไม่มี companyBranchId ให้เป็น null
+      }
+  
+      // ดึงข้อมูล department
+      if (userData.department) {
+        const departmentDoc = await db.collection('departments').doc(userData.department).get();
+        if (departmentDoc.exists) {
+          userData.department = departmentDoc.data(); // เพิ่มข้อมูล department
+          userData.department.id = departmentDoc.id; // เพิ่ม ID ของ department
+        } else {
+          userData.department = null; // ถ้าไม่พบ department ให้เป็น null
+        }
+      } else {
+        userData.department = null; // ถ้าไม่มี departmentId ให้เป็น null
+      }
+  
+      // ฟอร์แมตวันเกิดและคำนวณอายุ
+      if (userData.birthdate) {
+        userData.birthdate = fc.formatDate(userData.birthdate); // ฟอร์แมตวันเกิด
+        userData.age = fc.calculateAge(userData.birthdate); // คำนวณอายุ
+      }
+  
+      res.json(userData); // ส่งข้อมูลผู้ใช้
+    } catch (error) {
+      console.error("ข้อผิดพลาดในการดึงข้อมูลผู้ใช้", error);
+      res.status(500).json({ message: 'ข้อผิดพลาดในการดึงข้อมูลผู้ใช้: ' + error.message });
+    }
+  };
+  
+  
+
   module.exports.getUsersByCompany = async (req, res) => {
     try {
         const companyId = req.params.company; // รับ companyId จาก URL parameters
