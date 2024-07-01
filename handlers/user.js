@@ -76,6 +76,54 @@ module.exports.getUsers = async (req, res) => {
       res.status(500).json({ message: 'Error getting users: ' + error.message });
     }
   };
+  module.exports.getGeneralUsers = async (req, res) => {
+    try {
+        const usersSnapshot = await db.collection('users')
+            .where('department', '==', null)
+            .where('companybranch', '==', null)
+            .get();
+
+        if (usersSnapshot.empty) {
+            res.status(404).json({ message: 'No general users found' });
+            return;
+        }
+
+        const users = [];
+        usersSnapshot.forEach(doc => {
+            const userData = doc.data();
+            userData.id = doc.id;
+            userData.birthdate = fc.formatDate(userData.birthdate);
+            userData.age = fc.calculateAge(userData.birthdate);
+            users.push(userData);
+        });
+
+        res.json(users);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error getting general users: ' + error.message });
+    }
+};
+module.exports.getGeneralUserById = async (req, res) => {
+  try {
+      const userId = req.params.id;
+      const userDoc = await db.collection('users').doc(userId).get();
+
+      if (!userDoc.exists) {
+          res.status(404).json({ message: 'General user not found' });
+          return;
+      }
+
+      const userData = userDoc.data();
+      userData.id = userDoc.id;
+      userData.birthdate = fc.formatDate(userData.birthdate);
+      userData.age = fc.calculateAge(userData.birthdate);
+
+      res.json(userData);
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Error retrieving general user: ' + error.message });
+  }
+};
 
   module.exports.getUserById = async (req, res) => {
     try {
