@@ -8,7 +8,7 @@ module.exports.createRequest = async (req, res) => {
             requesterId: req.body.requesterId,
             responderId: req.body.responderId,
             status: req.body.status,
-            Time: new Date(req.body.Time),
+            Time: new Date(),
         };
 
         const requestDocRef = await db.collection('requests').add(requestData);
