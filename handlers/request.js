@@ -1,6 +1,6 @@
-// request.js
 const admin = require('../admin.js');
 const db = admin.firestore();
+const fc = require('./function.js');
 
 module.exports.createRequest = async (req, res) => {
     try {
@@ -18,24 +18,27 @@ module.exports.createRequest = async (req, res) => {
         res.status(500).json({ message: 'Error creating request: ' + error.message });
     }
 };
+
 module.exports.getRequests = async (req, res) => {
     try {
         const requestsSnapshot = await db.collection('requests').get();
         const requests = requestsSnapshot.docs.map(doc => {
             const data = doc.data();
-            data.id = doc.id; // เพิ่ม ID ของเอกสารในข้อมูลที่ส่งกลับ
+            data.id = doc.id; // Add document ID to the data
+            data.Time = fc.formatDate(data.Time); // Format the Time field
             return data;
         });
 
-        res.json(requests); // ส่งข้อมูลคำขอทั้งหมด
+        res.json(requests); // Send all request data
     } catch (error) {
         console.error('Error getting requests:', error);
         res.status(500).json({ message: 'Error getting requests: ' + error.message });
     }
 };
+
 module.exports.getRequestById = async (req, res) => {
     try {
-        const requestId = req.params.id; // รับ ID ของคำขอ
+        const requestId = req.params.id; // Get the request ID
         const requestDoc = await db.collection('requests').doc(requestId).get();
 
         if (!requestDoc.exists) {
@@ -44,17 +47,19 @@ module.exports.getRequestById = async (req, res) => {
         }
 
         const requestData = requestDoc.data();
-        requestData.id = requestDoc.id; // เพิ่ม ID ของเอกสารในข้อมูลที่ส่งกลับ
+        requestData.id = requestDoc.id; // Add document ID to the data
+        requestData.Time = fc.formatDate(requestData.Time); // Format the Time field
 
-        res.json(requestData); // ส่งข้อมูลคำขอกลับไป
+        res.json(requestData); // Send request data back
     } catch (error) {
         console.error('Error getting request by ID:', error);
         res.status(500).json({ message: 'Error getting request by ID: ' + error.message });
     }
 };
+
 module.exports.getRequestsByRequesterId = async (req, res) => {
     try {
-        const requesterId = req.params.requesterId; // รับ ID ของผู้ร้องขอ
+        const requesterId = req.params.requesterId; // Get the requester ID
         const requestsSnapshot = await db.collection('requests').where('requesterId', '==', requesterId).get();
 
         if (requestsSnapshot.empty) {
@@ -64,19 +69,21 @@ module.exports.getRequestsByRequesterId = async (req, res) => {
 
         const requests = requestsSnapshot.docs.map(doc => {
             const data = doc.data();
-            data.id = doc.id; // เพิ่ม ID ของเอกสารในข้อมูลที่ส่งกลับ
+            data.id = doc.id; // Add document ID to the data
+            data.Time = fc.formatDate(data.Time); // Format the Time field
             return data;
         });
 
-        res.json(requests); // ส่งข้อมูลคำขอทั้งหมดสำหรับผู้ร้องขอ
+        res.json(requests); // Send all requests for the requester
     } catch (error) {
         console.error('Error getting requests by requester ID:', error);
         res.status(500).json({ message: 'Error getting requests by requester ID: ' + error.message });
     }
 };
+
 module.exports.getRequestsByResponderId = async (req, res) => {
     try {
-        const responderId = req.params.responderId; // รับ ID ของผู้ตอบกลับ
+        const responderId = req.params.responderId; // Get the responder ID
         const requestsSnapshot = await db.collection('requests').where('responderId', '==', responderId).get();
 
         if (requestsSnapshot.empty) {
@@ -86,21 +93,23 @@ module.exports.getRequestsByResponderId = async (req, res) => {
 
         const requests = requestsSnapshot.docs.map(doc => {
             const data = doc.data();
-            data.id = doc.id; // เพิ่ม ID ของเอกสารในข้อมูลที่ส่งกลับ
+            data.id = doc.id; // Add document ID to the data
+            data.Time = fc.formatDate(data.Time); // Format the Time field
             return data;
         });
 
-        res.json(requests); // ส่งข้อมูลคำขอทั้งหมดสำหรับผู้ตอบกลับ
+        res.json(requests); // Send all requests for the responder
     } catch (error) {
         console.error('Error getting requests by responder ID:', error);
         res.status(500).json({ message: 'Error getting requests by responder ID: ' + error.message });
     }
 };
+
 module.exports.updateRequest = async (req, res) => {
     try {
-        const requestId = req.params.id; // รับ ID ของคำขอ
+        const requestId = req.params.id; // Get the request ID
         const updatedData = {
-            status: req.body.status, // อัปเดตสถานะ (0=รอการตอบรับ, 1=ยอมรับ, 2=ยกเลิก)
+            status: req.body.status, // Update status (0=pending, 1=accepted, 2=cancelled)
         };
 
         const requestRef = db.collection('requests').doc(requestId);
@@ -112,12 +121,13 @@ module.exports.updateRequest = async (req, res) => {
         res.status(500).json({ message: 'Error updating request: ' + error.message });
     }
 };
+
 module.exports.deleteRequest = async (req, res) => {
     try {
-        const requestId = req.params.id; // รับ ID ของคำขอ
+        const requestId = req.params.id; // Get the request ID
         const requestRef = db.collection('requests').doc(requestId);
 
-        await requestRef.delete(); // ลบคำขอ
+        await requestRef.delete(); // Delete the request
 
         res.json({ message: 'Request deleted successfully' });
     } catch (error) {
