@@ -112,8 +112,8 @@ module.exports.checkRequest = async (req, res) => {
 
         const snapshot = await db.collection('requests')
         
-        .where('requester', 'in', [requesterId, responderId])
-        .where('responder', 'in', [requesterId, responderId])
+        .where('requesterId', 'in', [requesterId, responderId])
+        .where('responderId', 'in', [requesterId, responderId])
         .get();
               if (snapshot.empty) {
             console.log('No matching documents');
