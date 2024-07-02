@@ -8,6 +8,7 @@ const companyBranch = require('./companybranch.js');
 
 module.exports.createCompany = async (req, res) => {
     try {
+
         console.log(req.body);
         const email = req.body.email;
         console.log(email);
@@ -18,7 +19,7 @@ module.exports.createCompany = async (req, res) => {
         const existingEmails = new Set([...companiesEmailSnapshot.docs.map(doc => doc.data().email), ...employeesEmailSnapshot.docs.map(doc => doc.data().email)]);
 
         if (existingEmails.size > 0) {
-            res.status(400).json({ message: 'Email already exists. Please choose a different email.' });
+            res.status(400).json({ message: 'Email exists.',companyId: "0" });
             return;
         }
 
