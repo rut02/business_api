@@ -104,6 +104,31 @@ module.exports.getRequestsByResponderId = async (req, res) => {
         res.status(500).json({ message: 'Error getting requests by responder ID: ' + error.message });
     }
 };
+module.exports.checkRequest = async (req, res) => {
+    
+    try {
+        const requesterId = req.params.requesterId;
+        const responderId = req.params.responderId;
+
+        const snapshot = await db.collection('requests')
+        
+        .where('requester', 'in', [requesterId, responderId])
+        .where('responder', 'in', [requesterId, responderId])
+        .get();
+              if (snapshot.empty) {
+            console.log('No matching documents');
+            return res.status(200).json({ status: false });
+        }
+        else {
+            console.log('Found a request');
+            return res.status(200).json({ status: true });
+        }
+    }
+    catch (error) {
+        console.log(error)
+        res.status(500).json({ message: 'Error checking request' });
+    }
+}
 
 module.exports.updateRequest = async (req, res) => {
     try {
