@@ -8,7 +8,7 @@ module.exports.createFriend = async (req, res) => {
             userId: req.body.userId,
             FriendsId: req.body.FriendsId,
             status: req.body.status,
-            time: new Date(req.body.time),
+            time: new Date(),
         };
 
         const friendDocRef = await db.collection('friends').add(friendData);
