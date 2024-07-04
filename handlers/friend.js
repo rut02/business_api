@@ -1,7 +1,7 @@
 // friends.js
 const admin = require('../admin.js');
 const db = admin.firestore();
-
+const { formatDate } = require('./function.js');
 module.exports.createFriend = async (req, res) => {
     try {
         const friendData = {
