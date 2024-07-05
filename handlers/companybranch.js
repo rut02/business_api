@@ -106,7 +106,7 @@ module.exports.updateCompanybranch = async (req, res) => {
         res.status(500).json({ message: 'Error updating companybranch: ' + error.message });
     }
 };
-module.exports.deleteCompanyBranch = async (req, res) => {
+module.exports.deleteCompanybranch = async (req, res) => {
     try {
         const branchId = req.params.id; // รับ ID ของสาขาจาก URL parameters
         const branchRef = db.collection('companybranches').doc(branchId);
