@@ -239,23 +239,38 @@ module.exports.updateCompany = async (req, res) => {
 module.exports.deleteCompany = async (req, res) => {
     try {
         const companyId = req.params.id; // รับ ID ของบริษัทจาก URL parameters
-
-        // ลบบริษัท
         const companyRef = db.collection('companies').doc(companyId);
-        await companyRef.delete();
 
-        // ค้นหาและลบผู้ใช้ที่เกี่ยวข้องกับบริษัท
-        const usersSnapshot = await db.collection('users').where('companyId', '==', companyId).get();
-        const deletePromises = [];
-        usersSnapshot.forEach(doc => {
-            const userRef = db.collection('users').doc(doc.id);
-            deletePromises.push(userRef.delete());
+        // ลบบริษัทและตรวจสอบเอกสารที่อ้างอิงถึง
+        await fc.deleteDocumentWithSubcollectionsAndReferences(companyRef, {
+            'companybranches': 'companyID',
+            'departments': 'companyID'
         });
-        await Promise.all(deletePromises);
 
-        res.json({ message: 'Company deleted successfully' });
+        // ตรวจสอบและลบเอกสารที่อ้างอิงถึง branch และ department
+        const branchesSnapshot = await db.collection('companybranches').where('companyID', '==', companyId).get();
+        const branchDeletePromises = branchesSnapshot.docs.map(branchDoc => 
+            fc.deleteDocumentWithSubcollectionsAndReferences(branchDoc.ref, {
+                'users': 'companybranch'
+            })
+        );
+
+        const departmentsSnapshot = await db.collection('departments').where('companyID', '==', companyId).get();
+        const departmentDeletePromises = departmentsSnapshot.docs.map(departmentDoc => 
+            fc.deleteDocumentWithSubcollectionsAndReferences(departmentDoc.ref, {
+                'users': 'department'
+            })
+        );
+
+        // รอให้การลบทั้งหมดเสร็จสิ้น
+        await Promise.all([
+            ...branchDeletePromises,
+            ...departmentDeletePromises
+        ]);
+
+        res.json({ message: 'ลบบริษัทและเอกสารที่เกี่ยวข้องเรียบร้อยแล้ว' });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error deleting company: ' + error.message });
+        console.error('เกิดข้อผิดพลาดในการลบบริษัท:', error);
+        res.status(500).json({ message: 'เกิดข้อผิดพลาดในการลบบริษัท: ' + error.message });
     }
 };

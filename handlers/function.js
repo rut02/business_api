@@ -35,4 +35,42 @@ module.exports.calculateAge = (birthdate) => {
     }
     return age;
   };
-  
+  module.exports.deleteDocumentWithSubcollectionsAndReferences = async (docRef, linkedCollections = {}) => {
+    try {
+        // ดึงเอกสารเพื่อตรวจสอบว่ามีอยู่หรือไม่
+        const documentSnapshot = await docRef.get();
+
+        if (!documentSnapshot.exists) {
+            throw new Error('เอกสารไม่พบ');
+        }
+
+        // ดึงซับคอลเลกชัน
+        const subcollections = await docRef.listCollections();
+        const deletePromises = [];
+
+        // ลบเอกสารภายในซับคอลเลกชันแบบเรียงลำดับ
+        for (const subcollection of subcollections) {
+            const subDocsSnapshot = await subcollection.get();
+            for (const subDoc of subDocsSnapshot.docs) {
+                deletePromises.push(deleteDocumentWithSubcollectionsAndReferences(subDoc.ref, linkedCollections));
+            }
+        }
+
+        // ลบเอกสารหลัก
+        deletePromises.push(docRef.delete());
+
+        // ตรวจสอบเอกสารที่อ้างอิงถึงเอกสารหลัก
+        for (const [collectionName, field] of Object.entries(linkedCollections)) {
+            const linkedSnapshot = await db.collection(collectionName).where(field, '==', docRef.id).get();
+            for (const linkedDoc of linkedSnapshot.docs) {
+                // ลบเอกสารที่เชื่อมโยง
+                deletePromises.push(deleteDocumentWithSubcollectionsAndReferences(linkedDoc.ref, linkedCollections));
+            }
+        }
+
+        // รอให้การลบทั้งหมดเสร็จสิ้น
+        await Promise.all(deletePromises);
+    } catch (error) {
+        console.error('เกิดข้อผิดพลาดในการลบเอกสารและซับคอลเลกชัน:', error);
+    }
+};
