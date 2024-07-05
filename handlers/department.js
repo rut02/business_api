@@ -1,6 +1,7 @@
 //department.js
 const admin = require('../admin.js');
 const db = admin.firestore();
+const fc = require('./function.js');
 
 module.exports.createDepartment = async (req, res) => {
     try {
@@ -95,16 +96,18 @@ module.exports.updateDepartment = async (req, res) => {
 };
 module.exports.deleteDepartment = async (req, res) => {
     try {
-        const departmentId = req.params.id; // รับ ID ของแผนก
-        const departmentRef = db.collection('departments').doc(departmentId); // อ้างอิงไปยังเอกสารแผนก
+        const departmentId = req.params.id; // รับ ID ของแผนกจาก URL parameters
+        const departmentRef = db.collection('departments').doc(departmentId);
 
-        await departmentRef.delete(); // ลบแผนก
+        // ลบแผนกและตรวจสอบเอกสารที่อ้างอิงถึง
+        await fc.deleteDocumentWithSubcollectionsAndReferences(departmentRef, {
+            'users': 'department'
+        });
 
-        res.json({ message: 'Department deleted successfully' });
+        res.json({ message: 'ลบแผนกและเอกสารที่เกี่ยวข้องเรียบร้อยแล้ว' });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error deleting department: ' + error.message });
+        console.error('เกิดข้อผิดพลาดในการลบแผนก:', error);
+        res.status(500).json({ message: 'เกิดข้อผิดพลาดในการลบแผนก: ' + error.message });
     }
 };
-
 

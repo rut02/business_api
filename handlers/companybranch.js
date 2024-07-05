@@ -1,7 +1,7 @@
 //companybranch.js
 const admin = require('../admin.js');
 const db = admin.firestore();
-
+const fc = require('./function.js');
 module.exports.createCompanybranch = async (req, res) => {
     try {
         const companybranchData = {
@@ -106,17 +106,20 @@ module.exports.updateCompanybranch = async (req, res) => {
         res.status(500).json({ message: 'Error updating companybranch: ' + error.message });
     }
 };
-module.exports.deleteCompanybranch = async (req, res) => {
+module.exports.deleteCompanyBranch = async (req, res) => {
     try {
-        const branchId = req.params.id; // รับ ID ของสาขา
-        const branchRef = db.collection('companybranches').doc(branchId); // อ้างอิงไปยังเอกสารสาขา
-        
-        await branchRef.delete(); // ลบสาขา
+        const branchId = req.params.id; // รับ ID ของสาขาจาก URL parameters
+        const branchRef = db.collection('companybranches').doc(branchId);
 
-        res.json({ message: 'Companybranch deleted successfully' });
+        // ลบสาขาและตรวจสอบเอกสารที่อ้างอิงถึง
+        await deleteDocumentWithSubcollectionsAndReferences(branchRef, {
+            'users': 'companybranch'
+        });
+
+        res.json({ message: 'ลบสาขาและเอกสารที่เกี่ยวข้องเรียบร้อยแล้ว' });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error deleting companybranch: ' + error.message }); // ข้อความข้อผิดพลาด
+        console.error('เกิดข้อผิดพลาดในการลบสาขา:', error);
+        res.status(500).json({ message: 'เกิดข้อผิดพลาดในการลบสาขา: ' + error.message });
     }
 };
 
