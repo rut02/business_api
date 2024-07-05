@@ -89,6 +89,13 @@ app.get('/templates/by-company/:companyID', templateController.getTemplatesByCom
 app.put('/templates/:id', templateController.updateTemplate); // อัปเดตข้อมูล template
 app.delete('/templates/:id', templateController.deleteTemplate); // ลบ template ตาม ID
 
+const positionController = require('./handlers/positiontem');
+app.post('/positions', positionController.createPosition); // สร้างตําแหน่งใหม่
+app.get('/positions', positionController.getPositions); // ดึงข้อมูลตําแหน่งทั้งหมด
+app.get('/positions/:id', positionController.getPositionById); // ดึงข้อมูลตําแหน่งตาม ID
+app.put('/positions/:id', positionController.updatePosition); // อัปเดตข้อมูลตําแหน่ง
+app.delete('/positions/:id', positionController.deletePosition); // ลบตําแหน่ง
+
 const requestController = require('./handlers/request');
 app.post('/requests', requestController.createRequest); // สร้าง request ใหม่
 app.get('/requests', requestController.getRequests); // ดึงข้อมูล request ทั้งหมด
