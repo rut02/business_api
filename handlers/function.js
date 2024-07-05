@@ -1,4 +1,6 @@
 //function.js
+const admin = require('../admin.js');
+const db = admin.firestore();
 // ฟังก์ชันเพื่อแปลง Firestore timestamp หรือ Date object ให้เป็นรูปแบบ YYYY-MM-DD
 module.exports.formatDate = function formatDate(date) {
     if (!date) {
