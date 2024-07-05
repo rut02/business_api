@@ -7,8 +7,7 @@ module.exports.createTemplate = async (req, res) => {
         const templateData = {
             name: req.body.name,
             companyID: req.body.companyID,
-            UrlLogo: req.body.UrlLogo,
-            UrlBackground: req.body.UrlBackground,
+            background: req.body.background,
         };
 
         const templateDocRef = await db.collection('templates').add(templateData);
