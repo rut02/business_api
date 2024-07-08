@@ -4,6 +4,8 @@ const db = admin.firestore();
 
 module.exports.createTemplate = async (req, res) => {
     try {
+        
+        console.log("createtemplate",req.body);
         const templateData = {
             name: req.body.name,
             companyID: req.body.companyID,
@@ -20,6 +22,7 @@ module.exports.createTemplate = async (req, res) => {
 };
 module.exports.getTemplates = async (req, res) => {
     try {
+        console.log("gettemplates");
         const templatesSnapshot = await db.collection('templates').get();
         const templates = templatesSnapshot.docs.map(doc => {
             const data = doc.data();
