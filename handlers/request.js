@@ -20,7 +20,7 @@ module.exports.createRequest = async (req, res) => {
 };
 module.exports.getFriendsByUserId = async (req, res) => {
     try {
-        const userId = req.params.userId; // รับ userId จาก URL parameters
+        const userId = req.params.id; // รับ userId จาก URL parameters
 
         // ค้นหาคำขอที่มี status = 1 (ยอมรับแล้ว) ที่ requesterId หรือ responderId เป็น userId ที่ระบุ
         const requestsSnapshot = await db.collection('requests')
