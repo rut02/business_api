@@ -9,7 +9,7 @@ module.exports.createTemplate = async (req, res) => {
         const templateData = {
             name: req.body.name,
             companyID: req.body.companyID,
-            background: req.body.background,
+            // background: req.body.background,
             fullname: req.body.fullname,
             companyName: req.body.companyName,
             companyAddress: req.body.companyAddress,
