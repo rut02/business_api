@@ -23,6 +23,7 @@ module.exports.createTemplate = async (req, res) => {
         };
 
         const templateDocRef = await db.collection('templates').add(templateData);
+        console.log("Template created with ID:", templateDocRef.id);
         res.json({ message: 'Template created successfully', templateId: templateDocRef.id });
     } catch (error) {
         console.error('Error creating template:', error);
