@@ -18,6 +18,48 @@ module.exports.createRequest = async (req, res) => {
         res.status(500).json({ message: 'Error creating request: ' + error.message });
     }
 };
+module.exports.getFriendsByUserId = async (req, res) => {
+    try {
+        const userId = req.params.userId; // รับ userId จาก URL parameters
+
+        // ค้นหาคำขอที่มี status = 1 (ยอมรับแล้ว) ที่ requesterId หรือ responderId เป็น userId ที่ระบุ
+        const requestsSnapshot = await db.collection('requests')
+            .where('status', '==', 1)
+            .where('requesterId', '==', userId)
+            .get();
+        
+        // ดึงข้อมูลคำขอที่ผู้ใช้เป็นผู้ตอบสนอง (responderId)
+        const responderSnapshot = await db.collection('requests')
+            .where('status', '==', 1)
+            .where('responderId', '==', userId)
+            .get();
+
+        const friends = [];
+
+        // เพิ่มเพื่อนจากคำขอที่ผู้ใช้เป็นผู้ขอ (requesterId)
+        requestsSnapshot.forEach(doc => {
+            const data = doc.data();
+            friends.push({
+                friendId: data.responderId, // responderId เป็นเพื่อน
+                time: fc.formatDate(data.time) // รูปแบบการแสดงเวลา
+            });
+        });
+
+        // เพิ่มเพื่อนจากคำขอที่ผู้ใช้เป็นผู้ตอบสนอง (responderId)
+        responderSnapshot.forEach(doc => {
+            const data = doc.data();
+            friends.push({
+                friendId: data.requesterId, // requesterId เป็นเพื่อน
+                time: fc.formatDate(data.time) // รูปแบบการแสดงเวลา
+            });
+        });
+
+        res.json(friends);
+    } catch (error) {
+        console.error('เกิดข้อผิดพลาดในการดึงรายชื่อเพื่อน:', error);
+        res.status(500).json({ message: 'เกิดข้อผิดพลาดในการดึงรายชื่อเพื่อน: ' + error.message });
+    }
+};
 
 module.exports.getRequests = async (req, res) => {
     try {
