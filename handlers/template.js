@@ -10,7 +10,16 @@ module.exports.createTemplate = async (req, res) => {
             name: req.body.name,
             companyID: req.body.companyID,
             background: req.body.background,
-            positiontemplate: req.body.positiontemplate,
+            fullname: req.body.fullname,
+            companyName: req.body.companyName,
+            companyAddress: req.body.companyAddress,
+            position: req.body.position,
+            email: req.body.email,
+            phone: req.body.phone,
+            phoneDepartment: req.body.phoneDepartment,
+            departmentName: req.body.departmentName,
+            logo: req.body.logo,
+            status: req.body.status,
         };
 
         const templateDocRef = await db.collection('templates').add(templateData);
@@ -85,8 +94,18 @@ module.exports.updateTemplate = async (req, res) => {
 
         const updatedData = {
             name: req.body.name,
-            UrlLogo: req.body.UrlLogo,
-            UrlBackground: req.body.UrlBackground,
+            companyID: req.body.companyID,
+            background: req.body.background,
+            fullname: req.body.fullname,
+            companyName: req.body.companyName,
+            companyAddress: req.body.companyAddress,
+            position: req.body.position,
+            email: req.body.email,
+            phone: req.body.phone,
+            phoneDepartment: req.body.phoneDepartment,
+            departmentName: req.body.departmentName,
+            logo: req.body.logo,
+            status: req.body.status,
         };
 
         await templateRef.update(updatedData); // อัปเดตข้อมูล
