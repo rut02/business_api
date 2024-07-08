@@ -100,7 +100,7 @@ const requestController = require('./handlers/request');
 app.post('/requests', requestController.createRequest); // สร้าง request ใหม่
 app.get('/requests', requestController.getRequests); // ดึงข้อมูล request ทั้งหมด
 app.get('/requests/:id', requestController.getRequestById); // ดึงข้อมูล request ตาม ID
-app.get('requests/friend/:id', requestController.getFriendsByUserId);
+app.get('/requests/friend/:id', requestController.getFriendsByUserId);
 app.get('/requests/check/:requesterId/:responderId', requestController.checkRequest);
 app.get('/requests/by-responder/:responderId', requestController.getRequestsByResponderId); // ดึงข้อมูล request ตามผู้ติดตาม
 app.get('/requests/by-requester/:requesterId', requestController.getRequestsByRequesterId); // ดึงข้อมูล request ตามผู้ส่งคําขอ
