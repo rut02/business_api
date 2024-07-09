@@ -50,7 +50,7 @@ module.exports.getFriendsByUserId = async (req, res) => {
             const data = doc.data();
             friends.push({
                 friendId: data.requesterId, // requesterId เป็นเพื่อน
-                time: fc.formatDate(data.time) // รูปแบบการแสดงเวลา
+                time: fc.formatDate(data.Time) // รูปแบบการแสดงเวลา
             });
         });
 
