@@ -24,13 +24,13 @@ module.exports.getFriendsByUserId = async (req, res) => {
 
         // ค้นหาคำขอที่มี status = 1 (ยอมรับแล้ว) ที่ requesterId หรือ responderId เป็น userId ที่ระบุ
         const requestsSnapshot = await db.collection('requests')
-            .where('status', '==', 1)
+            .where('status', '==', "1")
             .where('requesterId', '==', userId)
             .get();
         
         // ดึงข้อมูลคำขอที่ผู้ใช้เป็นผู้ตอบสนอง (responderId)
         const responderSnapshot = await db.collection('requests')
-            .where('status', '==', 1)
+            .where('status', '==', "1")
             .where('responderId', '==', userId)
             .get();
 
