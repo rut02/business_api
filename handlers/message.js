@@ -12,7 +12,7 @@ module.exports.createMessage = async (req, res) => {
         };
 
         const messageDocRef = await db.collection('messages').add(messageData);
-        res.json({ message: 'Message created successfully', messageId: messageDocRef.id });
+        res.status(201).json({ message: 'Message created successfully', messageId: messageDocRef.id });
     } catch (error) {
         console.error('Error creating message:', error);
         res.status(500).json({ message: 'Error creating message: ' + error.message });
