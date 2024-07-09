@@ -40,7 +40,7 @@ module.exports.getFriendsByUserId = async (req, res) => {
         requestsSnapshot.forEach(doc => {
             const data = doc.data();
             friends.push({
-                friendId: data.responderId, // responderId เป็นเพื่อน
+                friendsId: data.responderId, // responderId เป็นเพื่อน
                 time: fc.formatDate(data.Time), // รูปแบบการแสดงเวลา
                 status: data.status
             });
@@ -50,7 +50,7 @@ module.exports.getFriendsByUserId = async (req, res) => {
         responderSnapshot.forEach(doc => {
             const data = doc.data();
             friends.push({
-                friendId: data.requesterId, // requesterId เป็นเพื่อน
+                friendsId: data.requesterId, // requesterId เป็นเพื่อน
                 time: fc.formatDate(data.Time), // รูปแบบการแสดงเวลา
                 status: data.status
             });
