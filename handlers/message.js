@@ -18,7 +18,21 @@ module.exports.createMessage = async (req, res) => {
         res.status(500).json({ message: 'Error creating message: ' + error.message });
     }
 };
-
+module.exports.getMessages = async (req, res) => {
+    try {
+        const messagesSnapshot = await db.collection('messages').get();
+        const messages = messagesSnapshot.docs.map(doc => {
+            const data = doc.data();
+            data.messageId = doc.id;
+            data.DateTime = fc.formatDate(data.DateTime);
+            return data;
+        });
+        res.json(messages);
+    } catch (error) {
+        console.error('Error getting messages:', error);
+        res.status(500).json({ message: 'Error getting messages: ' + error.message });
+    }
+}
 module.exports.getMessagesBySenderId = async (req, res) => {
     try {
         const senderId = req.params.senderId;
@@ -32,6 +46,7 @@ module.exports.getMessagesBySenderId = async (req, res) => {
         const messages = messagesSnapshot.docs.map(doc => {
             const data = doc.data();
             data.messageId = doc.id;
+            data.DateTime = fc.formatDate(data.DateTime);
             return data;
         });
 
@@ -55,6 +70,7 @@ module.exports.getMessagesByReceiverId = async (req, res) => {
         const messages = messagesSnapshot.docs.map(doc => {
             const data = doc.data();
             data.messageId = doc.id;
+            data.DateTime = fc.formatDate(data.DateTime);
             return data;
         });
 

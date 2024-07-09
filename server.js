@@ -139,6 +139,8 @@ app.post('/messages', messageController.createMessage); // สร้างข้
 app.get('/messages/sender/:senderId', messageController.getMessagesBySenderId); // ดึงข้อความตาม ID ของผู้ส่ง
 app.get('/messages/receiver/:receiverId', messageController.getMessagesByReceiverId); // ดึงข้อความตาม ID ของผู้รับ
 
+app.get('/messages', messageController.getMessages);
+
 const loginController = require('./handlers/login');
 app.post('/login', loginController.login); // เข้าสู่ระบบ
 
