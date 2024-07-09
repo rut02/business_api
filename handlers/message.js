@@ -1,7 +1,7 @@
 //message.js
 const admin = require('../admin.js');
 const db = admin.firestore();
-
+const fc = require('./function.js');
 module.exports.createMessage = async (req, res) => {
     try {
         const messageData = {
