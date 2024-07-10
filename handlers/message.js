@@ -73,7 +73,7 @@ module.exports.getMessagesByReceiverId = async (req, res) => {
 
         const messages = messagesSnapshot.docs.map(doc => {
             const data = doc.data();
-            data.messageId = doc.id;
+            data.id = doc.id;
             data.DateTime = fc.formatDate(data.DateTime);
             return data;
         });
