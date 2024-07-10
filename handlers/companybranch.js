@@ -106,15 +106,22 @@ module.exports.updateCompanybranch = async (req, res) => {
         res.status(500).json({ message: 'Error updating companybranch: ' + error.message });
     }
 };
-module.exports.deleteCompanybranch = async (req, res) => {
+
+module.exports.deleteCompanyBranch = async (req, res) => {
     try {
         const branchId = req.params.id; // รับ ID ของสาขาจาก URL parameters
         const branchRef = db.collection('companybranches').doc(branchId);
 
-        // ลบสาขาและตรวจสอบเอกสารที่อ้างอิงถึง
-        await fc.deleteDocumentWithSubcollectionsAndReferences(branchRef, {
-            'users': 'companybranch'
-        });
+        // ค้นหาผู้ใช้ทั้งหมดในสาขาของบริษัท
+        const usersSnapshot = await db.collection('users').where('companybranch', '==', branchId).get();
+        
+        // ลบผู้ใช้ทั้งหมดในสาขา
+        const deleteUserPromises = usersSnapshot.docs.map(doc => doc.ref.delete());
+        await Promise.all(deleteUserPromises);
+
+        // ลบเอกสารของสาขา
+        await branchRef.delete();
+        
 
         res.json({ message: 'ลบสาขาและเอกสารที่เกี่ยวข้องเรียบร้อยแล้ว' });
     } catch (error) {
@@ -122,4 +129,5 @@ module.exports.deleteCompanybranch = async (req, res) => {
         res.status(500).json({ message: 'เกิดข้อผิดพลาดในการลบสาขา: ' + error.message });
     }
 };
+
 

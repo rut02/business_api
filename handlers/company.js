@@ -236,29 +236,46 @@ module.exports.updateCompany = async (req, res) => {
         res.status(500).json({ message: 'Error updating company: ' + error.message });
     }
 };
+
 module.exports.deleteCompany = async (req, res) => {
     try {
         const companyId = req.params.id;
-        const companyRef = db.collection('companies').doc(companyId);
 
-        await fc.deleteDocumentWithSubcollectionsAndReferences(companyRef, {
-            'companybranches': 'companyID',
-            'departments': 'companyID'
+        // Delete departments related to the company
+        const departmentsQuerySnapshot = await db.collection('departments').where('companyID', '==', companyId).get();
+        const deleteDepartmentsPromises = departmentsQuerySnapshot.docs.map(async doc => {
+            // Delete users in the department
+            const usersQuerySnapshot = await db.collection('users').where('department', '==', doc.id).get();
+            const deleteUsersPromises = usersQuerySnapshot.docs.map(userDoc => userDoc.ref.delete());
+
+            // Delete the department document
+            await Promise.all(deleteUsersPromises);
+            return doc.ref.delete();
         });
+        await Promise.all(deleteDepartmentsPromises);
 
-        const branchesSnapshot = await db.collection('companybranches').where('companyID', '==', companyId).get();
-        const branchDeletePromises = branchesSnapshot.docs.map(branchDoc =>
-            fc.deleteDocumentWithSubcollectionsAndReferences(branchDoc.ref, {
-                'users': 'companybranch'
-            })
-        );
+        // Delete company branches related to the company
+        const branchesQuerySnapshot = await db.collection('companybranches').where('companyID', '==', companyId).get();
+        const deleteBranchesPromises = branchesQuerySnapshot.docs.map(async doc => {
+            // Delete users in the branch
+            const usersQuerySnapshot = await db.collection('users').where('companybranch', '==', doc.id).get();
+            const deleteUsersPromises = usersQuerySnapshot.docs.map(userDoc => userDoc.ref.delete());
 
-        await Promise.all([
-            ...branchDeletePromises,
-            
-        ]);
+            // Delete the branch document
+            await Promise.all(deleteUsersPromises);
+            return doc.ref.delete();
+        });
+        await Promise.all(deleteBranchesPromises);
 
-        res.json({ message: 'ลบบริษัทและเอกสารที่เกี่ยวข้องเรียบร้อยแล้ว' });
+        // Delete templates related to the company (if applicable)
+        const templatesQuerySnapshot = await db.collection('templates').where('companyID', '==', companyId).get();
+        const deleteTemplatesPromises = templatesQuerySnapshot.docs.map(doc => doc.ref.delete());
+        await Promise.all(deleteTemplatesPromises);
+
+        // Delete the company document itself
+        await companyRef.delete();
+
+        res.json({ message: 'ลบบริษัทและข้อมูลที่เกี่ยวข้องเรียบร้อยแล้ว' });
     } catch (error) {
         console.error('เกิดข้อผิดพลาดในการลบบริษัท:', error);
         res.status(500).json({ message: 'เกิดข้อผิดพลาดในการลบบริษัท: ' + error.message });

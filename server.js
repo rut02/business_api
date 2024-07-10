@@ -64,7 +64,7 @@ app.get('/companybranches/:id', companyBranchController.getCompanybranchById); /
 app.get('/companybranches/by-company/:companyID', companyBranchController.getCompanybranchesByCompanyID); // ดึงข้อมูลสาขาตาม CompanyID
 app.get('/users/company/:companyId', userController.getUsersByCompany);
 app.put('/companybranches/:id', companyBranchController.updateCompanybranch); // อัปเดตสาขา
-app.delete('/companybranches/:id', companyBranchController.deleteCompanybranch); // ลบสาขา
+app.delete('/companybranches/:id', companyBranchController.deleteCompanyBranch); // ลบสาขา
 
 const departmentController = require('./handlers/department');
 

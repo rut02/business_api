@@ -99,10 +99,15 @@ module.exports.deleteDepartment = async (req, res) => {
         const departmentId = req.params.id; // รับ ID ของแผนกจาก URL parameters
         const departmentRef = db.collection('departments').doc(departmentId);
 
-        // ลบแผนกและตรวจสอบเอกสารที่อ้างอิงถึง
-        await fc.deleteDocumentWithSubcollectionsAndReferences(departmentRef, {
-            'users': 'department'
-        });
+        // Find all users in the department
+        const usersSnapshot = await db.collection('users').where('department', '==', departmentId).get();
+        
+        // Delete all users in the department
+        const deleteUserPromises = usersSnapshot.docs.map(doc => doc.ref.delete());
+        await Promise.all(deleteUserPromises);
+
+        // Delete the department document
+        await departmentRef.delete();
 
         res.json({ message: 'ลบแผนกและเอกสารที่เกี่ยวข้องเรียบร้อยแล้ว' });
     } catch (error) {
@@ -110,4 +115,3 @@ module.exports.deleteDepartment = async (req, res) => {
         res.status(500).json({ message: 'เกิดข้อผิดพลาดในการลบแผนก: ' + error.message });
     }
 };
-
