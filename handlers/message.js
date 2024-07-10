@@ -1,7 +1,7 @@
-//message.js
 const admin = require('../admin.js');
 const db = admin.firestore();
 const fc = require('./function.js');
+
 module.exports.createMessage = async (req, res) => {
     try {
         const messageData = {
@@ -18,9 +18,14 @@ module.exports.createMessage = async (req, res) => {
         res.status(500).json({ message: 'Error creating message: ' + error.message });
     }
 };
+
 module.exports.getMessages = async (req, res) => {
     try {
         const messagesSnapshot = await db.collection('messages').get();
+        if (messagesSnapshot.empty) {
+            return res.status(404).json({ message: 'No messages found' });
+        }
+        
         const messages = messagesSnapshot.docs.map(doc => {
             const data = doc.data();
             data.id = doc.id;
@@ -32,15 +37,15 @@ module.exports.getMessages = async (req, res) => {
         console.error('Error getting messages:', error);
         res.status(500).json({ message: 'Error getting messages: ' + error.message });
     }
-}
+};
+
 module.exports.getMessagesBySenderId = async (req, res) => {
     try {
         const senderId = req.params.senderId;
         const messagesSnapshot = await db.collection('messages').where('senderId', '==', senderId).get();
 
         if (messagesSnapshot.empty) {
-            res.status(404).json({ message: 'No messages found for this sender' });
-            return ;
+            return res.status(404).json({ message: 'No messages found for this sender' });
         }
 
         const messages = messagesSnapshot.docs.map(doc => {
@@ -63,8 +68,7 @@ module.exports.getMessagesByReceiverId = async (req, res) => {
         const messagesSnapshot = await db.collection('messages').where('receiverId', '==', receiverId).get();
 
         if (messagesSnapshot.empty) {
-            res.status(404).json({ message: 'No messages found for this receiver' });
-            return;
+            return res.status(404).json({ message: 'No messages found for this receiver' });
         }
 
         const messages = messagesSnapshot.docs.map(doc => {
