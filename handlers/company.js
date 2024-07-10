@@ -239,28 +239,29 @@ module.exports.updateCompany = async (req, res) => {
 module.exports.deleteCompany = async (req, res) => {
     try {
         const companyId = req.params.id; // รับ ID ของบริษัทจาก URL parameters
+        
         const companyRef = db.collection('companies').doc(companyId);
-
+                // ตรวจสอบและลบเอกสารที่อ้างอิงถึง branch และ department
+                const branchesSnapshot = await db.collection('companybranches').where('companyID', '==', companyId).get();
+                const branchDeletePromises = branchesSnapshot.docs.map(branchDoc => 
+                    fc.deleteDocumentWithSubcollectionsAndReferences(branchDoc.ref, {
+                        'users': 'companybranch'
+                    })
+                );
+        
+                const departmentsSnapshot = await db.collection('departments').where('companyID', '==', companyId).get();
+                const departmentDeletePromises = departmentsSnapshot.docs.map(departmentDoc => 
+                    fc.deleteDocumentWithSubcollectionsAndReferences(departmentDoc.ref, {
+                        'users': 'department'
+                    })
+                );
         // ลบบริษัทและตรวจสอบเอกสารที่อ้างอิงถึง
         await fc.deleteDocumentWithSubcollectionsAndReferences(companyRef, {
             'companybranches': 'companyID',
             'departments': 'companyID'
         });
 
-        // ตรวจสอบและลบเอกสารที่อ้างอิงถึง branch และ department
-        const branchesSnapshot = await db.collection('companybranches').where('companyID', '==', companyId).get();
-        const branchDeletePromises = branchesSnapshot.docs.map(branchDoc => 
-            fc.deleteDocumentWithSubcollectionsAndReferences(branchDoc.ref, {
-                'users': 'companybranch'
-            })
-        );
 
-        const departmentsSnapshot = await db.collection('departments').where('companyID', '==', companyId).get();
-        const departmentDeletePromises = departmentsSnapshot.docs.map(departmentDoc => 
-            fc.deleteDocumentWithSubcollectionsAndReferences(departmentDoc.ref, {
-                'users': 'department'
-            })
-        );
 
         // รอให้การลบทั้งหมดเสร็จสิ้น
         await Promise.all([
