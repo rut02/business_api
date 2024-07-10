@@ -38,10 +38,10 @@ module.exports.getMessagesBySenderId = async (req, res) => {
         const senderId = req.params.senderId;
         const messagesSnapshot = await db.collection('messages').where('senderId', '==', senderId).get();
 
-        if (messagesSnapshot.empty) {
-            res.status(404).json({ message: 'No messages found for this sender' });
-            return;
-        }
+        // if (messagesSnapshot.empty) {
+        //     res.status(404).json({ message: 'No messages found for this sender' });
+        //     return;
+        // }
 
         const messages = messagesSnapshot.docs.map(doc => {
             const data = doc.data();
@@ -62,10 +62,10 @@ module.exports.getMessagesByReceiverId = async (req, res) => {
         const receiverId = req.params.receiverId;
         const messagesSnapshot = await db.collection('messages').where('receiverId', '==', receiverId).get();
 
-        if (messagesSnapshot.empty) {
-            res.status(404).json({ message: 'No messages found for this receiver' });
-            return;
-        }
+        // if (messagesSnapshot.empty) {
+        //     res.status(404).json({ message: 'No messages found for this receiver' });
+        //     return;
+        // }
 
         const messages = messagesSnapshot.docs.map(doc => {
             const data = doc.data();
