@@ -253,16 +253,9 @@ module.exports.deleteCompany = async (req, res) => {
             })
         );
 
-        const departmentsSnapshot = await db.collection('departments').where('companyID', '==', companyId).get();
-        const departmentDeletePromises = departmentsSnapshot.docs.map(departmentDoc =>
-            fc.deleteDocumentWithSubcollectionsAndReferences(departmentDoc.ref, {
-                'users': 'department'
-            })
-        );
-
         await Promise.all([
             ...branchDeletePromises,
-            ...departmentDeletePromises
+            
         ]);
 
         res.json({ message: 'ลบบริษัทและเอกสารที่เกี่ยวข้องเรียบร้อยแล้ว' });
