@@ -112,7 +112,7 @@ module.exports.deleteCompanybranch = async (req, res) => {
         const branchRef = db.collection('companybranches').doc(branchId);
 
         // ลบสาขาและตรวจสอบเอกสารที่อ้างอิงถึง
-        await deleteDocumentWithSubcollectionsAndReferences(branchRef, {
+        await fc.deleteDocumentWithSubcollectionsAndReferences(branchRef, {
             'users': 'companybranch'
         });
 
