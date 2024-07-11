@@ -1,6 +1,6 @@
 const admin = require('../admin.js');
 const db = admin.firestore();
-const fc = require('./function.js');
+const { format } = require('date-fns'); // เพิ่มการ import date-fns
 
 module.exports.createMessage = async (req, res) => {
     try {
@@ -29,7 +29,7 @@ module.exports.getMessages = async (req, res) => {
         const messages = messagesSnapshot.docs.map(doc => {
             const data = doc.data();
             data.id = doc.id;
-            data.DateTime = fc.formatDate(data.DateTime);
+            data.DateTime = format(data.DateTime.toDate(), 'yyyy-MM-dd HH:mm:ss'); // ใช้ date-fns ในการ format วันที่
             return data;
         });
         res.json(messages);
@@ -51,7 +51,7 @@ module.exports.getMessagesBySenderId = async (req, res) => {
         const messages = messagesSnapshot.docs.map(doc => {
             const data = doc.data();
             data.id = doc.id;
-            data.DateTime = fc.formatDate(data.DateTime);
+            data.DateTime = format(data.DateTime.toDate(), 'yyyy-MM-dd HH:mm:ss'); // ใช้ date-fns ในการ format วันที่
             return data;
         });
 
@@ -74,7 +74,7 @@ module.exports.getMessagesByReceiverId = async (req, res) => {
         const messages = messagesSnapshot.docs.map(doc => {
             const data = doc.data();
             data.id = doc.id;
-            data.DateTime = fc.formatDate(data.DateTime);
+            data.DateTime = format(data.DateTime.toDate(), 'yyyy-MM-dd HH:mm:ss'); // ใช้ date-fns ในการ format วันที่
             return data;
         });
 
