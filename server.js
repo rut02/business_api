@@ -92,6 +92,7 @@ app.get('/messages', async (req, res) => {
 
 app.get('/messages/sender/:senderId', async (req, res) => {
     try {
+      console.log("getMessagesBySenderId");
         const senderId = req.params.senderId;
         const messagesSnapshot = await db.collection('messages').where('senderId', '==', senderId).get();
 
@@ -115,6 +116,7 @@ app.get('/messages/sender/:senderId', async (req, res) => {
 
 app.get('/messages/receiver/:receiverId', async (req, res) => {
     try {
+        console.log("getMessagesByReceiverId");
         const receiverId = req.params.receiverId;
         const messagesSnapshot = await db.collection('messages').where('receiverId', '==', receiverId).get();
 
