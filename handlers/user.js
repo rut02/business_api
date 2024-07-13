@@ -378,44 +378,64 @@ module.exports.getUsersByCompany_position = async (req, res) => {
 
 
 
-module.exports.updateUser = async (req, res) => {
-    try {
-        const userId = req.params.id; // รับ ID ของผู้ใช้จาก URL parameters
-        const userRef = db.collection('users').doc(userId); // อ้างอิงไปยังเอกสารผู้ใช้
-        const userSnapshot = await userRef.get(); // ดึงข้อมูลของผู้ใช้
+  const bcrypt = require('bcrypt');
 
-        if (!userSnapshot.exists) {
-            // ถ้าไม่พบผู้ใช้
-            res.status(404).json({ message: 'User not found' });
-            return;
-        }
-
-        // ข้อมูลที่จะอัปเดต
-        const updatedData = {
-            firstname: req.body.firstname,
-            lastname: req.body.lastname,
-            // email: req.body.email,
-            // password: password,
-            gender : req.body.gender,
-            birthdate : new Date(req.body.birthdate),
-            companybranch :req.body.companybranch||null,
-            department : req.body.department||null,
-            positionTemplate : req.body.positionTemplate,
-            phone : req.body.phone,
-            position : req.body.position,
-            startwork : req.body.startwork||null,
-            address: req.body.subdistrict+","+req.body.district+","+req.body.province+","+req.body.country,
-
-        };
-
-        await userRef.update(updatedData); // อัปเดตข้อมูลผู้ใช้
-
-        res.json({ message: 'User updated successfully' });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error updating user: ' + error.message });
-    }
-};
+  module.exports.updateUser = async (req, res) => {
+      try {
+          const userId = req.params.id; 
+          const userRef = db.collection('users').doc(userId); 
+          const userSnapshot = await userRef.get(); 
+  
+          if (!userSnapshot.exists) {
+             
+              res.status(404).json({ message: 'User not found' });
+              return;
+          }
+  
+          const currentUserData = userSnapshot.data();
+          const email = req.body.email;
+  
+         
+          const companiesEmailSnapshot = await db.collection('companies').where('email', '==', email).get();
+          const usersEmailSnapshot = await db.collection('users').where('email', '==', email).get();
+  
+          if ((!companiesEmailSnapshot.empty && currentUserData.email !== email) || 
+              (!usersEmailSnapshot.empty && usersEmailSnapshot.docs.some(doc => doc.id !== userId))) {
+              res.status(400).json({ message: 'Email already exists' });
+              return;
+          }
+          const updatedData = {
+              firstname: req.body.firstname,
+              lastname: req.body.lastname,
+              email: email,
+              gender: req.body.gender,
+              birthdate: new Date(req.body.birthdate),
+              companybranch: req.body.companybranch || null,
+              department: req.body.department || null,
+              positionTemplate: req.body.positionTemplate,
+              phone: req.body.phone,
+              position: req.body.position,
+              startwork: req.body.startwork || null,
+              address: req.body.subdistrict + "," + req.body.district + "," + req.body.province + "," + req.body.country,
+          };
+  
+          if (req.body.password) {
+              const isSamePassword = await bcrypt.compare(req.body.password, currentUserData.password);
+              if (!isSamePassword) {
+                  const hashedPassword = await bcrypt.hash(req.body.password, 10);
+                  updatedData.password = hashedPassword;
+              }
+          }
+  
+          await userRef.update(updatedData); // อัปเดตข้อมูลผู้ใช้
+  
+          res.json({ message: 'User updated successfully' });
+      } catch (error) {
+          console.error(error);
+          res.status(500).json({ message: 'Error updating user: ' + error.message });
+      }
+  };
+  
 module.exports.updateAddress = async (req, res) => {
     try {
         const userId = req.params.id; // รับ ID ของผู้ใช้
