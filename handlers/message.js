@@ -41,6 +41,7 @@ module.exports.getMessages = async (req, res) => {
 
 module.exports.getMessagesBySenderId = async (req, res) => {
     try {
+        console.log("getMessagesBySenderId");
         const senderId = req.params.senderId;
         const messagesSnapshot = await db.collection('messages').where('senderId', '==', senderId).get();
 
@@ -64,6 +65,7 @@ module.exports.getMessagesBySenderId = async (req, res) => {
 
 module.exports.getMessagesByReceiverId = async (req, res) => {
     try {
+        console.log("getMessagesByReceiverId");
         const receiverId = req.params.receiverId;
         const messagesSnapshot = await db.collection('messages').where('receiverId', '==', receiverId).get();
 
