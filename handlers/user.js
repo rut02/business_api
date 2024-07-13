@@ -375,11 +375,6 @@ module.exports.getUsersByCompany_position = async (req, res) => {
       res.status(500).json({ message: 'Error getting users by department: ' + error.message });
     }
   };
-
-
-
-  const bcrypt = require('bcrypt');
-
   module.exports.updateUser = async (req, res) => {
       try {
           const userId = req.params.id; 
