@@ -1,4 +1,3 @@
-// server.js
 const express = require("express");
 const app = express();
 const multer = require('multer');
@@ -7,7 +6,6 @@ const cors = require("cors");
 const { format } = require('date-fns');
 const WebSocket = require('ws');
 const admin = require('./admin.js');
-const db = admin.firestore();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -19,40 +17,12 @@ app.use(cors({
 }));
 
 const PORT = process.env.PORT || 3000;
-const wss = new WebSocket.Server({ noServer: true });
 
-wss.on('connection', ws => {
-    ws.on('message', async (message) => {
-        const data = JSON.parse(message);
-        if (data.type === 'createMessage') {
-            try {
-                const messageData = {
-                    messageContent: data.messageContent,
-                    DateTime: new Date(),
-                    senderId: data.senderId,
-                    receiverId: data.receiverId,
-                };
+// Import message handlers
+const messageHandlers = require('./handlers/message');
 
-                const messageDocRef = await db.collection('messages').add(messageData);
-                ws.send(JSON.stringify({ message: 'Message created successfully', messageId: messageDocRef.id }));
-                
-                // ส่งข้อความไปยังลูกค้าทั้งหมดที่เชื่อมต่ออยู่
-                wss.clients.forEach(client => {
-                    if (client !== ws && client.readyState === WebSocket.OPEN) {
-                        client.send(JSON.stringify({
-                            type: 'newMessage',
-                            message: messageData
-                        }));
-                    }
-                });
-
-            } catch (error) {
-                console.error('Error creating message:', error);
-                ws.send(JSON.stringify({ message: 'Error creating message: ' + error.message }));
-            }
-        }
-    });
-});
+// WebSocket server for messages
+const wss = messageHandlers.wss;
 
 const server = app.listen(PORT, () => {
   console.log(`server is running on port ${PORT}`);
@@ -70,73 +40,9 @@ app.get('/', (req, res) => {
 });
 
 // REST API endpoints for messages
-app.get('/messages', async (req, res) => {
-    try {
-        const messagesSnapshot = await db.collection('messages').get();
-        if (messagesSnapshot.empty) {
-            return res.status(404).json({ message: 'No messages found' });
-        }
-        
-        const messages = messagesSnapshot.docs.map(doc => {
-            const data = doc.data();
-            data.id = doc.id;
-            data.DateTime = format(data.DateTime.toDate(), 'yyyy-MM-dd HH:mm:ss');
-            return data;
-        });
-        res.json(messages);
-    } catch (error) {
-        console.error('Error getting messages:', error);
-        res.status(500).json({ message: 'Error getting messages: ' + error.message });
-    }
-});
-
-app.get('/messages/sender/:senderId', async (req, res) => {
-    try {
-      console.log("getMessagesBySenderId");
-        const senderId = req.params.senderId;
-        const messagesSnapshot = await db.collection('messages').where('senderId', '==', senderId).get();
-
-        if (messagesSnapshot.empty) {
-            return res.status(404).json({ message: 'No messages found for this sender' });
-        }
-
-        const messages = messagesSnapshot.docs.map(doc => {
-            const data = doc.data();
-            data.id = doc.id;
-            data.DateTime = format(data.DateTime.toDate(), 'yyyy-MM-dd HH:mm:ss');
-            return data;
-        });
-
-        res.json(messages);
-    } catch (error) {
-        console.error('Error getting messages by sender ID:', error);
-        res.status(500).json({ message: 'Error getting messages by sender ID: ' + error.message });
-    }
-});
-
-app.get('/messages/receiver/:receiverId', async (req, res) => {
-    try {
-        console.log("getMessagesByReceiverId");
-        const receiverId = req.params.receiverId;
-        const messagesSnapshot = await db.collection('messages').where('receiverId', '==', receiverId).get();
-
-        if (messagesSnapshot.empty) {
-            return res.status(404).json({ message: 'No messages found for this receiver' });
-        }
-
-        const messages = messagesSnapshot.docs.map(doc => {
-            const data = doc.data();
-            data.id = doc.id;
-            data.DateTime = format(data.DateTime.toDate(), 'yyyy-MM-dd HH:mm:ss');
-            return data;
-        });
-
-        res.json(messages);
-    } catch (error) {
-        console.error('Error getting messages by receiver ID:', error);
-        res.status(500).json({ message: 'Error getting messages by receiver ID: ' + error.message });
-    }
-});
+app.get('/messages', messageHandlers.getMessages);
+app.get('/messages/sender/:senderId', messageHandlers.getMessagesBySenderId);
+app.get('/messages/receiver/:receiverId', messageHandlers.getMessagesByReceiverId);
 
 // Other routes for your application
 const companyController = require('./handlers/company');
