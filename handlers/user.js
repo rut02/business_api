@@ -412,7 +412,7 @@ module.exports.getUsersByCompany_position = async (req, res) => {
               birthdate: new Date(req.body.birthdate),
               companybranch: req.body.companybranch || null,
               department: req.body.department || null,
-              positionTemplate: req.body.positionTemplate,
+              // positionTemplate: req.body.positionTemplate,
               phone: req.body.phone,
               position: req.body.position,
               startwork: req.body.startwork || null,
