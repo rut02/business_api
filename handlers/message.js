@@ -18,14 +18,17 @@ wss.on('connection', ws => {
                 };
 
                 const messageDocRef = await db.collection('messages').add(messageData);
+                const savedMessage = await messageDocRef.get();
+                const messageWithId = { ...savedMessage.data(), id: savedMessage.id };
+
                 ws.send(JSON.stringify({ message: 'Message created successfully', messageId: messageDocRef.id }));
                 
                 // Broadcast the message to all connected clients
                 wss.clients.forEach(client => {
-                    if (client !== ws && client.readyState === WebSocket.OPEN) {
+                    if (client.readyState === WebSocket.OPEN) {
                         client.send(JSON.stringify({
                             type: 'newMessage',
-                            message: messageData
+                            message: messageWithId
                         }));
                     }
                 });
@@ -37,6 +40,7 @@ wss.on('connection', ws => {
         }
     });
 });
+
 
 module.exports = {
     wss,
