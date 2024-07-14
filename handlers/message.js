@@ -12,7 +12,7 @@ wss.on('connection', ws => {
             try {
                 const messageData = {
                     messageContent: data.messageContent,
-                    DateTime: new Date(),
+                    dateTime: new Date(),
                     senderId: data.senderId,
                     receiverId: data.receiverId,
                 };
@@ -54,7 +54,7 @@ module.exports = {
             const messages = messagesSnapshot.docs.map(doc => {
                 const data = doc.data();
                 data.id = doc.id;
-                data.DateTime = format(data.DateTime.toDate(), 'yyyy-MM-dd HH:mm:ss');
+                data.dateTime = format(data.dateTime.toDate(), 'yyyy-MM-dd HH:mm:ss');
                 return data;
             });
             res.json(messages);
@@ -77,7 +77,7 @@ module.exports = {
             const messages = messagesSnapshot.docs.map(doc => {
                 const data = doc.data();
                 data.id = doc.id;
-                data.DateTime = format(data.DateTime.toDate(), 'yyyy-MM-dd HH:mm:ss');
+                data.dateTime = format(data.dateTime.toDate(), 'yyyy-MM-dd HH:mm:ss');
                 return data;
             });
 
@@ -101,7 +101,7 @@ module.exports = {
             const messages = messagesSnapshot.docs.map(doc => {
                 const data = doc.data();
                 data.id = doc.id;
-                data.DateTime = format(data.DateTime.toDate(), 'yyyy-MM-dd HH:mm:ss');
+                data.dateTime = format(data.dateTime.toDate(), 'yyyy-MM-dd HH:mm:ss');
                 return data;
             });
 
