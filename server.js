@@ -102,6 +102,10 @@ app.get('/positions/:id', positionController.getPositionById);
 app.put('/positions/:id', positionController.updatePosition);
 app.delete('/positions/:id', positionController.deletePosition);
 
+const loginController = require('./handlers/login');
+app.post('/login', loginController.login);
+app.post('/logout', loginController.logout);
+
 const requestController = require('./handlers/request');
 app.post('/requests', requestController.createRequest);
 app.get('/requests', requestController.getRequests);
