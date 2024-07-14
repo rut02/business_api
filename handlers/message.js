@@ -7,9 +7,13 @@ const wss = new WebSocket.Server({ port: 8080 });
 
 wss.on('connection', ws => {
     ws.on('message', async (message) => {
+        console.log('m');
         const data = JSON.parse(message);
         if (data.type === 'createMessage') {
+            console
             try {
+                console.log('createMessage');
+                console.log(data);
                 const messageData = {
                     messageContent: data.messageContent,
                     dateTime: new Date(),
@@ -25,6 +29,7 @@ wss.on('connection', ws => {
                 
                 // Broadcast the message to all connected clients
                 wss.clients.forEach(client => {
+                    console.log('wss.clients');
                     if (client.readyState === WebSocket.OPEN) {
                         client.send(JSON.stringify({
                             type: 'newMessage',
