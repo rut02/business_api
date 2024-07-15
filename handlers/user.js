@@ -147,6 +147,82 @@ module.exports.getGeneralUserById = async (req, res) => {
       res.status(500).json({ message: 'Error retrieving user: ' + error.message });
     }
   };
+  module.exports.getUserById_companyId = async (req, res) => {
+    try {
+      console.log("getUserById_companyId: Fetching user by ID and company ID");
+      const { userId, companyId } = req.params;
+  
+      // Fetch user document by userId
+      const userDoc = await db.collection('users').doc(userId).get();
+  
+      if (!userDoc.exists) {
+        res.status(404).json({ message: 'ไม่พบผู้ใช้' });
+        return;
+      }
+  
+      const userData = userDoc.data();
+      userData.id = userDoc.id; // Add user ID
+  
+      // Fetch companybranch information
+      if (userData.companybranch) {
+        const companyBranchDoc = await db.collection('companybranches').doc(userData.companybranch).get();
+        if (companyBranchDoc.exists) {
+          const companyBranchData = companyBranchDoc.data();
+  
+          // Verify company ID
+          if (companyBranchData.companyID !== companyId) {
+            res.status(404).json({ message: 'ไม่พบผู้ใช้ในบริษัทนี้' });
+            return;
+          }
+  
+          userData.companybranch = companyBranchData; // Add companybranch data
+          userData.companybranch.id = companyBranchDoc.id; // Add companybranch ID
+  
+          // Fetch company information from companyID in companybranch
+          const companyDoc = await db.collection('companies').doc(companyBranchData.companyID).get();
+          if (companyDoc.exists) {
+            userData.companybranch.company = companyDoc.data(); // Add company data
+            userData.companybranch.company.id = companyDoc.id; // Add company ID
+  
+            if (userData.companybranch.company.yearFounded) {
+              userData.companybranch.company.yearFounded = fc.formatDate(userData.companybranch.company.yearFounded);
+            }
+          } else {
+            userData.companybranch.company = null; // If company not found, set to null
+          }
+        } else {
+          userData.companybranch = null; // If companybranch not found, set to null
+        }
+      } else {
+        userData.companybranch = null; // If no companyBranchId, set to null
+      }
+  
+      // Fetch department information
+      if (userData.department) {
+        const departmentDoc = await db.collection('departments').doc(userData.department).get();
+        if (departmentDoc.exists) {
+          userData.department = departmentDoc.data(); // Add department data
+          userData.department.id = departmentDoc.id; // Add department ID
+        } else {
+          userData.department = null; // If department not found, set to null
+        }
+      } else {
+        userData.department = null; // If no departmentId, set to null
+      }
+  
+      // Format birthdate and calculate age
+      if (userData.birthdate) {
+        userData.birthdate = fc.formatDate(userData.birthdate); // Format birthdate
+        userData.age = fc.calculateAge(userData.birthdate); // Calculate age
+      }
+  
+      res.json(userData); // Send user data
+    } catch (error) {
+      console.error("ข้อผิดพลาดในการดึงข้อมูลผู้ใช้", error);
+      res.status(500).json({ message: 'ข้อผิดพลาดในการดึงข้อมูลผู้ใช้: ' + error.message });
+    }
+  };
+  
   module.exports.getUserById_all = async (req, res) => {
     try {
       console.log("getUserById_v2: Fetching user by ID");
