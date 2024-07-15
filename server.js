@@ -57,7 +57,7 @@ const userController = require('./handlers/user');
 app.post('/users', userController.createUser);
 app.get('/users', userController.getUsers);
 app.get('/user/:id', userController.getUserById_all);
-app.get('/user/id_and_company/userId/companyId', userController.getUserById_companyId);// ที่ขอ
+app.get('/user/by-company/:companyId', userController.getUserByCompanyId);// ที่ขอ
 app.get('/generalusers', userController.getGeneralUsers);
 app.get('/generalusers/:id', userController.getGeneralUserById);
 app.get('/users/by-company/:company', userController.getUsersByCompany);
