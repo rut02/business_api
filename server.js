@@ -54,6 +54,7 @@ app.put('/companies/:id', companyController.updateCompany);
 app.delete('/companies/:id', companyController.deleteCompany);
 
 const userController = require('./handlers/user');
+// app.get("/user/token/:id", userController.getUserToken);
 app.post('/users', userController.createUser);
 app.get('/users', userController.getUsers);
 app.get('/user/:id', userController.getUserById_all);
@@ -143,3 +144,6 @@ app.get('/joins/by-group/:groupId', joinController.getJoinsByGroupId);
 app.get('/joins/by-user/:userId', joinController.getJoinsByUserId);
 app.put('/joins/:id', joinController.updateJoin);
 app.delete('/joins/:id', joinController.deleteJoin);
+
+const notificationController = require('./handlers/notification');
+app.post('/notifications', notificationController.sendNotification);

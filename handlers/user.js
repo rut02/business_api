@@ -5,6 +5,26 @@ const bcrypt = require('bcrypt');
 const fc = require('./function.js');
 const imgController = require('./img.js'); // อ้างอิงไปยังฟังก์ชันการอัปโหลดรูปภาพ
 
+
+async function getUserToken(userId) {
+  try {
+    const userRef = db.collection('users').doc(userId);
+    const doc = await userRef.get();
+    if (!doc.exists) {
+      console.log('No such user!');
+      return null;
+    } else {
+      const userData = doc.data();
+      return userData.token; // Assuming token is stored in user document
+    }
+  } catch (error) {
+    console.error('Error fetching user token:', error);
+    return null;
+  }
+}
+module.exports = {
+  getUserToken
+};
 module.exports.createUser = async (req, res) => {
     try {
         console.log(req.body);

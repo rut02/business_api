@@ -37,6 +37,7 @@ module.exports.createCompany = async (req, res) => {
             logo: req.body.logo,            
             email: req.body.email,
             password: password,
+            status:"0",
             
         };
 
@@ -197,6 +198,9 @@ module.exports.updateCompany = async (req, res) => {
             website: req.body.website,
             yearFounded: new Date(req.body.yearFounded),
             logo: req.body.logo,
+            email: req.body.email,
+            password: req.body.password,
+            status: req.body.status,
             
             
         };
