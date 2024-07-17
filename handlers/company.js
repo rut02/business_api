@@ -240,7 +240,19 @@ module.exports.updateCompany = async (req, res) => {
         res.status(500).json({ message: 'Error updating company: ' + error.message });
     }
 };
-
+module.exports.updateStatus = async (req, res) => {
+    try {
+        const companyId = req.params.id;
+        const status = req.body.status;
+        const companyRef = db.collection('companies').doc(companyId);
+        await companyRef.update({ status: status });
+        res.json({ message: 'Company status updated successfully' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error updating company status: ' + error.message });
+    
+}
+}
 module.exports.deleteCompany = async (req, res) => {
     try {
         const companyId = req.params.id;

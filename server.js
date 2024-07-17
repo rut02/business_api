@@ -51,6 +51,7 @@ app.get('/companies', companyController.getCompanies);
 app.get('/companies/:companyId', companyController.getCompanyById);
 app.get('/companies/Name/:companyName', companyController.getCompanyByName);
 app.put('/companies/:id', companyController.updateCompany);
+app.put('/companies/status/:id', companyController.updateStatus);
 app.delete('/companies/:id', companyController.deleteCompany);
 
 const userController = require('./handlers/user');
