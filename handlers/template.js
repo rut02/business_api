@@ -117,6 +117,18 @@ module.exports.updateTemplate = async (req, res) => {
         res.status(500).json({ message: 'Error updating template: ' + error.message });
     }
 };
+module.exports.updateStatus = async (req, res) => {
+    try {
+        const templateId = req.params.id;
+        const status = req.body.status;
+        const templateRef = db.collection('templates').doc(templateId);
+        await templateRef.update({ status: status }); // อัปเดตข้อมูล
+        res.json({ message: 'Template status updated successfully' });
+    } catch (error) {
+        console.error('Error updating template status:', error);
+        res.status(500).json({ message: 'Error updating template status: ' + error.message });
+    }
+};
 module.exports.deleteTemplate = async (req, res) => {
     try {
         const templateId = req.params.id; // รับ ID ของเทมเพลตจาก URL parameters
