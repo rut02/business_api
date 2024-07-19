@@ -149,3 +149,8 @@ app.delete('/joins/:id', joinController.deleteJoin);
 
 const notificationController = require('./handlers/notification');
 app.post('/notifications', notificationController.sendNotification);
+
+const genCardController = require('./handlers/genCard');
+
+const gen_cardcontroller = require('./handlers/gen_card');
+app.post('/gen_card', gen_cardcontroller.genCard); // สร้างบัตร
