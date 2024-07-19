@@ -256,7 +256,7 @@ module.exports.updateStatus = async (req, res) => {
 module.exports.deleteCompany = async (req, res) => {
     try {
         const companyId = req.params.id;
-
+        console.log(companyId);
         // Delete departments related to the company
         const departmentsQuerySnapshot = await db.collection('departments').where('companyID', '==', companyId).get();
         const deleteDepartmentsPromises = departmentsQuerySnapshot.docs.map(async doc => {
