@@ -121,12 +121,29 @@ module.exports.updateStatus = async (req, res) => {
     try {
         const templateId = req.params.id;
         const status = req.body.status;
-        const templateRef = db.collection('templates').doc(templateId);
-        await templateRef.update({ status: status }); // อัปเดตข้อมูล
-        res.json({ message: 'Template status updated successfully' });
+        const companyId = req.body.companyId;
+
+        // Fetch templates by companyId and update their status to "0"
+        const templatesRef = db.collection('templates');
+        const querySnapshot = await templatesRef.where('companyId', '==', companyId).get();
+
+        const batch = db.batch();
+
+        querySnapshot.forEach(doc => {
+            batch.update(doc.ref, { status: "0" });
+        });
+
+        // Update the specific template status to the given status
+        const templateRef = templatesRef.doc(templateId);
+        batch.update(templateRef, { status: status });
+
+        // Commit the batch
+        await batch.commit();
+
+        res.json({ message: 'Template statuses updated successfully' });
     } catch (error) {
-        console.error('Error updating template status:', error);
-        res.status(500).json({ message: 'Error updating template status: ' + error.message });
+        console.error('Error updating template statuses:', error);
+        res.status(500).json({ message: 'Error updating template statuses: ' + error.message });
     }
 };
 module.exports.deleteTemplate = async (req, res) => {
