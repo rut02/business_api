@@ -79,17 +79,11 @@ async function uploadImage(filePath, userId) {
     }
 }
 
-// ฟังก์ชันดึงข้อมูลจาก Firestore
-async function fetchData(uid) {
+// ฟังก์ชันดึงข้อมูลจาก API
+async function fetchData(url) {
     try {
-        const userRef = db.collection('users').doc(uid);
-        const doc = await userRef.get();
-
-        if (doc.exists) {
-            return doc.data();
-        } else {
-            throw new Error('No such document!');
-        }
+        const response = await axios.get(url);
+        return response.data;
     } catch (error) {
         console.error('Error fetching data:', error.message);
         return null;
@@ -108,17 +102,14 @@ async function createBusinessCard(data) {
 
     const uploadResult = await uploadImage(imagePath, data.id);
     console.log('Upload result:', uploadResult);
-
-    if (uploadResult && uploadResult.imageUrl) {
-        await updateBusinessCard(uploadResult.imageUrl, data.id);
-    }
 }
 
 // ฟังก์ชันหลัก
 module.exports.genCard = async (req, res) => {
     try {
         const uid = req.body.uid;
-        const data = await fetchData(uid);
+        const apiUrl = api + '/users/' + uid;
+        const data = await fetchData(apiUrl);
 
         if (data) {
             await createBusinessCard(data);
