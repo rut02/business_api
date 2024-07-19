@@ -37,7 +37,7 @@ module.exports.createUser = async (req, res) => {
         const existingEmails = new Set([...companiesEmailSnapshot.docs.map(doc => doc.data().email), ...usersEmailSnapshot.docs.map(doc => doc.data().email)]);
 
         if (existingEmails.size > 0) {
-            res.status(400).json({ message: 'Email already exists. Please choose a different email.' });
+            res.status(400).json({ message: 'Email already exists', userId: "0" });
             console.log("existingEmails");
             console.log(existingEmails.size);
             return;
