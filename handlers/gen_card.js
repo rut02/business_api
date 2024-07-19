@@ -52,7 +52,7 @@ async function uploadImage(filePath, userId) {
         const form = new FormData();
         form.append('file', fs.createReadStream(filePath));
         form.append('uid', userId);
-        form.append('folder', 'business_card');
+        form.append('folder', 'business_cards');
         form.append('collection', 'users');
 
         // ใช้ฟังก์ชันแบบอะซิงโครนัสเพื่อคำนวณ Content-Length
