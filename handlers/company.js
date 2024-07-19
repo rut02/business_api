@@ -289,6 +289,7 @@ module.exports.deleteCompany = async (req, res) => {
         await Promise.all(deleteTemplatesPromises);
 
         // Delete the company document itself
+        const companyRef = db.collection('companies').doc(companyId);
         await companyRef.delete();
 
         res.json({ message: 'ลบบริษัทและข้อมูลที่เกี่ยวข้องเรียบร้อยแล้ว' });
