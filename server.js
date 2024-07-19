@@ -96,6 +96,7 @@ app.get('/templates', templateController.getTemplates);
 app.get('/templates/:id', templateController.getTemplateById);
 app.get('/templates/by-company/:companyID', templateController.getTemplatesByCompanyID);
 app.put('/templates/:id', templateController.updateTemplate);
+app.put('/templates/status/:id/:companyId', templateController.updateStatus);
 app.delete('/templates/:id', templateController.deleteTemplate);
 
 const positionController = require('./handlers/positiontem');
