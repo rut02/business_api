@@ -121,7 +121,7 @@ module.exports.updateStatus = async (req, res) => {
     try {
         const templateId = req.params.id;
         const status = req.body.status;
-        const companyId = req.body.companyId;
+        const companyId = req.params.companyId;
 
         // Fetch templates by companyId and update their status to "0"
         const templatesRef = db.collection('templates');
