@@ -57,6 +57,7 @@ app.delete('/companies/:id', companyController.deleteCompany);
 const userController = require('./handlers/user');
 // app.get("/user/token/:id", userController.getUserToken);
 app.post('/users', userController.createUser);
+app.post('/user/token', userController.saveUserToken);
 app.get('/users', userController.getUsers);
 app.get('/user/:id', userController.getUserById_all);
 app.get('/user/by-company/:companyId', userController.getUserByCompanyId);// ที่ขอ

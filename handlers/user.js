@@ -22,8 +22,25 @@ async function getUserToken(userId) {
     return null;
   }
 }
+async function saveUserToken (req, res) {
+  const { userId, token } = req.body;
+
+  if (!userId || !token) {
+    return res.status(400).send('Missing userId or token');
+  }
+
+  try {
+    await db.collection('users').doc(userId).set({ token }, { merge: true });
+    res.status(200).send('Token saved successfully');
+  } catch (error) {
+    console.error('Error saving token:', error);
+    res.status(500).send('Internal Server Error');
+  }
+};
 module.exports = {
-  getUserToken
+  getUserToken,
+  saveUserToken
+
 };
 module.exports.createUser = async (req, res) => {
     try {
