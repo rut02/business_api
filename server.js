@@ -55,7 +55,7 @@ app.put('/companies/status/:id', companyController.updateStatus);
 app.delete('/companies/:id', companyController.deleteCompany);
 
 const userController = require('./handlers/user');
-// app.get("/user/token/:id", userController.getUserToken);
+app.get("/user/token/:id", userController.getUserToken);
 app.post('/users', userController.createUser);
 app.post('/user/token', userController.saveUserToken);
 app.get('/users', userController.getUsers);
