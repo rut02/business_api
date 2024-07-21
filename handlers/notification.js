@@ -15,7 +15,7 @@ async function sendNotification(req, res) {
   const message = {
     notification: {
       title: messageTitle,
-      data: messageBody
+      body: messageBody
     },
     token: token
   };
