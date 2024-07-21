@@ -273,7 +273,7 @@ module.exports.getGeneralUserById = async (req, res) => {
       console.log(`Fetching users by company ID: ${companyId} and department ID: ${departmentId}`);
   
       const usersSnapshot = await db.collection('users')
-        .where('company', '==', companyId)
+        .where('companyID', '==', companyId)
         .where('department', '==', departmentId)
         .get();
   
