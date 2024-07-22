@@ -704,6 +704,111 @@ module.exports.getUsersByDepartment = async (req, res) => {
     res.status(500).json({ message: 'Error getting users by department: ' + error.message });
   }
 };
+module.exports.getUsersByCompanyAndDepartmentName = async (req, res) => {
+  try {
+    const { companyId, departmentName } = req.params;
+    console.log(`Company id: ${companyId}, Department Name: ${departmentName}`);
+
+    // ดึงข้อมูลบริษัทตามชื่อบริษัท
+    const companiesSnapshot = await db.collection('companies').doc(companyId).get();
+
+    if (companiesSnapshot.empty) {
+      res.status(404).json({ message: 'ไม่พบบริษัท' });
+      return;
+    }
+
+    const companyIds = companiesSnapshot.docs.map(doc => doc.id);
+    console.log(companyIds);
+
+    // ดึงข้อมูลแผนกตามชื่อแผนกและ companyId
+    const departmentsSnapshot = await db.collection('departments')
+      .where('name', '==', departmentName)
+      .where('companyID', 'in', companyIds)
+      .get();
+
+    if (departmentsSnapshot.empty) {
+      res.status(404).json({ message: 'ไม่พบแผนกที่ตรงกับชื่อแผนกและบริษัทนี้' });
+      return;
+    }
+
+    const departmentIds = departmentsSnapshot.docs.map(doc => doc.id);
+    console.log(departmentIds);
+
+    // ดึงข้อมูลผู้ใช้ตาม departmentIds
+    const usersSnapshot = await db.collection('users')
+      .where('department', 'in', departmentIds)
+      .get();
+
+    if (usersSnapshot.empty) {
+      res.status(404).json({ message: 'ไม่พบผู้ใช้ในแผนกที่ระบุ' });
+      return;
+    }
+
+    const users = [];
+
+    for (const doc of usersSnapshot.docs) {
+      const userData = doc.data();
+      userData.id = doc.id; // เพิ่ม ID ผู้ใช้
+
+      // ดึงข้อมูลสาขา
+      if (userData.companybranch) {
+        const companyBranchDoc = await db.collection('companybranches').doc(userData.companybranch).get();
+        if (companyBranchDoc.exists) {
+          userData.companybranch = companyBranchDoc.data();
+          userData.companybranch.id = companyBranchDoc.id;
+
+          // ดึงข้อมูลบริษัท
+          if (userData.companybranch.companyID) {
+            const companyDoc = await db.collection('companies').doc(userData.companybranch.companyID).get();
+            if (companyDoc.exists) {
+              userData.companybranch.company = companyDoc.data();
+              userData.companybranch.company.id = companyDoc.id;
+
+              if (userData.companybranch.company.yearFounded) {
+                userData.companybranch.company.yearFounded = fc.formatDate(userData.companybranch.company.yearFounded);
+              }
+            } else {
+              userData.companybranch.company = null;
+            }
+          } else {
+            userData.companybranch.company = null;
+          }
+        } else {
+          userData.companybranch = null;
+        }
+      } else {
+        userData.companybranch = null;
+      }
+
+      // ดึงข้อมูลแผนก
+      if (userData.department) {
+        const departmentDoc = await db.collection('departments').doc(userData.department).get();
+        if (departmentDoc.exists) {
+          userData.department = departmentDoc.data();
+          userData.department.id = departmentDoc.id;
+        } else {
+          userData.department = null;
+        }
+      } else {
+        userData.department = null;
+      }
+
+      // ฟอร์แมตวันเกิดและคำนวณอายุ
+      if (userData.birthdate) {
+        userData.birthdate = fc.formatDate(userData.birthdate);
+        userData.age = fc.calculateAge(userData.birthdate);
+      }
+
+      users.push(userData);
+    }
+
+    res.json(users); // ส่งข้อมูลผู้ใช้
+  } catch (error) {
+    console.error("ข้อผิดพลาดในการดึงข้อมูลผู้ใช้", error);
+    res.status(500).json({ message: 'ข้อผิดพลาดในการดึงข้อมูลผู้ใช้: ' + error.message });
+  }
+};
+
 module.exports.updateUser = async (req, res) => {
   try {
     const userId = req.params.id;

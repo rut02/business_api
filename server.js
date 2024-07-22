@@ -64,6 +64,7 @@ app.get('/user/by-company/:companyId', userController.getUserByCompanyId);// ท
 app.get('/generalusers', userController.getGeneralUsers);
 app.get('/generalusers/:id', userController.getGeneralUserById);
 app.get('/users/by-company/:company', userController.getUsersByCompany);
+app.get('/users/by-company/:companyId/departmentName/:departmentName', userController.getUsersByCompanyAndDepartmentName);
 app.get('/users/by-companyandposition/:company/:position', userController.getUsersByCompany_position);
 app.get('/users/by-Companyanddepartment/:companyId/:departmentId', userController.getUsersByCompany_department);
 app.get('/users/by-companyandcompanybranch/:companyId/:branchId', userController.getUserByCompany_companybranch);
