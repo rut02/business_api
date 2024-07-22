@@ -707,23 +707,20 @@ module.exports.getUsersByDepartment = async (req, res) => {
 module.exports.getUsersByCompanyAndDepartmentName = async (req, res) => {
   try {
     const { companyId, departmentName } = req.params;
-    console.log(`Company id: ${companyId}, Department Name: ${departmentName}`);
+    console.log(`Company ID: ${companyId}, Department Name: ${departmentName}`);
 
-    // ดึงข้อมูลบริษัทตามชื่อบริษัท
-    const companiesSnapshot = await db.collection('companies').doc(companyId).get();
+    // ดึงข้อมูลบริษัทตาม companyId
+    const companyDoc = await db.collection('companies').doc(companyId).get();
 
-    if (companiesSnapshot.empty) {
+    if (!companyDoc.exists) {
       res.status(404).json({ message: 'ไม่พบบริษัท' });
       return;
     }
 
-    const companyIds = companiesSnapshot.docs.map(doc => doc.id);
-    console.log(companyIds);
-
     // ดึงข้อมูลแผนกตามชื่อแผนกและ companyId
     const departmentsSnapshot = await db.collection('departments')
       .where('name', '==', departmentName)
-      .where('companyID', 'in', companyIds)
+      .where('companyID', '==', companyId)
       .get();
 
     if (departmentsSnapshot.empty) {
