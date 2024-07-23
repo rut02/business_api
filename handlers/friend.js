@@ -102,25 +102,24 @@ module.exports.getFriendsByFriendsId = async (req, res) => {
 };
 module.exports.updateStatus = async (req, res) => {
     try {
-        const friendId = req.params.id; // รับ ID ของเพื่อน
+        const friendId = req.params.friendId; // รับ ID ของเพื่อน
         const userId = req.params.userId;
         const updatedData = {
             status: req.body.status, // อัปเดตสถานะ (0=ธรรมดา, 1=โปรด)
         };
 
-        // ค้นหาเอกสารที่ตรงกับ userId และ friendId
-        const friendsRef = db.collection('friends');
-        const snapshot = await friendsRef.where('userId', '==', userId).where('FriendsId', '==', friendId).get();
+        const friendRef = db.collection('friends')
+            .where('userId', '==', userId)
+            .where('FriendsId', '==', friendId);
 
+        const snapshot = await friendRef.get();
         if (snapshot.empty) {
-            res.status(404).json({ message: 'Friend not found' });
-            return;
+            return res.status(404).json({ message: 'Friend not found' });
         }
 
-        // อัปเดตสถานะของเพื่อนแต่ละคนในผลลัพธ์ที่ได้
-        snapshot.forEach(async (doc) => {
-            await doc.ref.update(updatedData);
-        });
+        // Assuming there's only one document matching the query
+        const doc = snapshot.docs[0];
+        await doc.ref.update(updatedData);
 
         res.json({ message: 'Friend updated successfully' });
     } catch (error) {
@@ -128,6 +127,8 @@ module.exports.updateStatus = async (req, res) => {
         res.status(500).json({ message: 'Error updating friend: ' + error.message });
     }
 }
+
+
 
 module.exports.updateFriend = async (req, res) => {
     try {
