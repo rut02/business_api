@@ -110,7 +110,7 @@ module.exports.updateStatus = async (req, res) => {
 
         // ค้นหาเอกสารที่ตรงกับ userId และ friendId
         const friendsRef = db.collection('friends');
-        const snapshot = await friendsRef.where('userId', '==', userId).where('friendId', '==', friendId).get();
+        const snapshot = await friendsRef.where('userId', '==', userId).where('FriendsId', '==', friendId).get();
 
         if (snapshot.empty) {
             res.status(404).json({ message: 'Friend not found' });
