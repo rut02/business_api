@@ -67,7 +67,7 @@ module.exports.getFriendsByUserId = async (req, res) => {
         const friends = friendsSnapshot.docs.map(doc => {
             const data = doc.data();
             data.id = doc.id; // เพิ่ม ID ของเอกสารในข้อมูลที่ส่งกลับ
-            data.time = format(data.time, 'yyyy-MM-dd HH:mm:ss').toString();
+            data.time = data.dateTime = format(data.dateTime.toDate(), 'yyyy-MM-dd HH:mm:ss');
             return data;
         });
 
