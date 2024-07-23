@@ -2,6 +2,7 @@
 const admin = require('../admin.js');
 const db = admin.firestore();
 const { formatDate } = require('./function.js');
+const { format } = require('date-fns');
 module.exports.createFriend = async (req, res) => {
     try {
         const friendData = {
@@ -66,7 +67,7 @@ module.exports.getFriendsByUserId = async (req, res) => {
         const friends = friendsSnapshot.docs.map(doc => {
             const data = doc.data();
             data.id = doc.id; // เพิ่ม ID ของเอกสารในข้อมูลที่ส่งกลับ
-            data.time = formatDate(data.time); // แปลงและฟอแมต timestamp ให้เป็น YYYY-MM-DD
+            data.time = format(data.time, 'yyyy-MM-dd HH:mm:ss');
             return data;
         });
 
