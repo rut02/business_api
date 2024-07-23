@@ -108,8 +108,19 @@ module.exports.updateStatus = async (req, res) => {
             status: req.body.status, // อัปเดตสถานะ (0=ธรรมดา, 1=โปรด)
         };
 
-        const friendRef = db.collection('friends').doc().where('userId', '==', userId).where('FriendsId', '==', friendId);
-        await friendRef.update(updatedData);
+        // ค้นหาเอกสารที่ตรงกับ userId และ friendId
+        const friendsRef = db.collection('friends');
+        const snapshot = await friendsRef.where('userId', '==', userId).where('friendId', '==', friendId).get();
+
+        if (snapshot.empty) {
+            res.status(404).json({ message: 'Friend not found' });
+            return;
+        }
+
+        // อัปเดตสถานะของเพื่อนแต่ละคนในผลลัพธ์ที่ได้
+        snapshot.forEach(async (doc) => {
+            await doc.ref.update(updatedData);
+        });
 
         res.json({ message: 'Friend updated successfully' });
     } catch (error) {
@@ -117,6 +128,7 @@ module.exports.updateStatus = async (req, res) => {
         res.status(500).json({ message: 'Error updating friend: ' + error.message });
     }
 }
+
 module.exports.updateFriend = async (req, res) => {
     try {
         const friendId = req.params.id; // รับ ID ของเพื่อน
