@@ -25,7 +25,7 @@ module.exports.getFriends = async (req, res) => {
         const friends = friendsSnapshot.docs.map(doc => {
             const data = doc.data();
             data.id = doc.id; // เพิ่ม ID ของเอกสารในข้อมูลที่ส่งกลับ
-            data.time = formatDate(data.time); // แปลงและฟอแมต timestamp ให้เป็น YYYY-MM-DD
+            data.time = format(data.time.toDate(), 'yyyy-MM-dd HH:mm:ss'); // แปลงและฟอแมต timestamp ให้เป็น YYYY-MM-DD
             return data;
         });
 
@@ -47,7 +47,7 @@ module.exports.getFriendById = async (req, res) => {
 
         const friendData = friendDoc.data();
         friendData.id = friendDoc.id; // เพิ่ม ID ของเอกสารเข้าไปในข้อมูลที่ส่งกลับ
-        friendData.time = formatDate(friendData.time); // แปลงและฟอแมต timestamp ให้เป็น YYYY-MM-DD
+        friendData.time = format(friendData.time.toDate(), 'yyyy-MM-dd HH:mm:ss'); // แปลงและฟอแมต timestamp ให้เป็น YYYY-MM-DD
         res.json(friendData); // ส่งข้อมูลของเพื่อนกลับไป
     } catch (error) {
         console.error('Error getting friend by ID:', error); // ข้อผิดพลาดในการดึงข้อมูลเพื่อน
@@ -67,7 +67,7 @@ module.exports.getFriendsByUserId = async (req, res) => {
         const friends = friendsSnapshot.docs.map(doc => {
             const data = doc.data();
             data.id = doc.id; // เพิ่ม ID ของเอกสารในข้อมูลที่ส่งกลับ
-            data.time = data.dateTime = format(data.dateTime.toDate(), 'yyyy-MM-dd HH:mm:ss');
+           data.time = format(data.time.toDate(), 'yyyy-MM-dd HH:mm:ss');
             return data;
         });
 
