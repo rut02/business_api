@@ -132,6 +132,7 @@ app.get('/friends/:id', friendController.getFriendById);
 app.get('/friends/by-user/:userId', friendController.getFriendsByUserId);
 app.get('/friends/by-friend/:friendId', friendController.getFriendsByFriendsId);
 app.put('/friends/:id', friendController.updateFriend);
+app.put('/friends/status/:userId/:friendId', friendController.updateStatus);
 app.delete('/friends/:id', friendController.deleteFriend);
 
 const groupController = require('./handlers/group');

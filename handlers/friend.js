@@ -100,6 +100,23 @@ module.exports.getFriendsByFriendsId = async (req, res) => {
         res.status(500).json({ message: 'Error getting friends by FriendsId: ' + error.message });
     }
 };
+module.exports.updateStatus = async (req, res) => {
+    try {
+        const friendId = req.params.id; // รับ ID ของเพื่อน
+        const userId = req.params.userId;
+        const updatedData = {
+            status: req.body.status, // อัปเดตสถานะ (0=ธรรมดา, 1=โปรด)
+        };
+
+        const friendRef = db.collection('friends').doc().where('userId', '==', userId).where('FriendsId', '==', friendId);
+        await friendRef.update(updatedData);
+
+        res.json({ message: 'Friend updated successfully' });
+    } catch (error) {
+        console.error('Error updating friend:', error);
+        res.status(500).json({ message: 'Error updating friend: ' + error.message });
+    }
+}
 module.exports.updateFriend = async (req, res) => {
     try {
         const friendId = req.params.id; // รับ ID ของเพื่อน
