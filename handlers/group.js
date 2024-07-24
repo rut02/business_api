@@ -65,7 +65,7 @@ module.exports.getGroupsByOwnerId = async (req, res) => {
 
         const groups = groupsSnapshot.docs.map(doc => {
             const data = doc.data();
-            data.groupId = doc.id; 
+            data.id = doc.id; 
             return data;
         });
 
