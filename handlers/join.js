@@ -65,7 +65,7 @@ module.exports.getJoinsByGroupId = async (req, res) => {
 
         const joins = joinsSnapshot.docs.map(doc => {
             const data = doc.data();
-            data.joinId = doc.id; 
+            data.id = doc.id; 
             return data;
         });
 
