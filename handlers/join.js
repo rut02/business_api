@@ -5,7 +5,7 @@ const db = admin.firestore();
 module.exports.createJoin = async (req, res) => {
     try {
         const joinData = {
-            GroupId: req.body.GroupId,
+            groupId: req.body.groupId,
             userId: req.body.userId,
         };
 
@@ -55,8 +55,8 @@ module.exports.getJoinById = async (req, res) => {
 
 module.exports.getJoinsByGroupId = async (req, res) => {
     try {
-        const groupId = req.params.GroupId; // รับ GroupId จาก URL parameters
-        const joinsSnapshot = await db.collection('joins').where('GroupId', '==', groupId).get();
+        const groupId = req.params.groupId; // รับ GroupId จาก URL parameters
+        const joinsSnapshot = await db.collection('joins').where('groupId', '==', groupId).get();
 
         if (joinsSnapshot.empty) {
             res.status(404).json({ message: 'No joins found for this group' });
@@ -104,7 +104,7 @@ module.exports.updateJoin = async (req, res) => {
         const joinRef = db.collection('joins').doc(joinId); 
 
         const updatedData = {
-            GroupId: req.body.GroupId,
+            groupId: req.body.groupId,
             userId: req.body.userId,
         };
 
