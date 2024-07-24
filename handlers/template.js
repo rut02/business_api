@@ -125,7 +125,7 @@ module.exports.updateStatus = async (req, res) => {
 
         // Fetch templates by companyId and update their status to "0"
         const templatesRef = db.collection('templates');
-        const querySnapshot = await templatesRef.where('companyId', '==', companyId).get();
+        const querySnapshot = await templatesRef.where('companyID', '==', companyId).get();
 
         const batch = db.batch();
 
