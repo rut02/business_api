@@ -160,3 +160,7 @@ app.post('/notifications', notificationController.sendNotification);
 
 const gen_cardcontroller = require('./handlers/gen_card');
 app.post('/gen_card', gen_cardcontroller.genCard); // สร้างบัตร
+
+// Import qrScanner routes
+const qrScanner = require('./handlers/qr.js');
+app.use(qrScanner);
