@@ -151,6 +151,7 @@ app.get('/joins/by-group/:groupId', joinController.getJoinsByGroupId);
 app.get('/joins/by-user/:userId', joinController.getJoinsByUserId);
 app.put('/joins/:id', joinController.updateJoin);
 app.delete('/joins/:id', joinController.deleteJoin);
+app.delete('/joins/:id/:groupId', joinController.deleteUser);
 
 const notificationController = require('./handlers/notification');
 app.post('/notifications', notificationController.sendNotification);
