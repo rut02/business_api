@@ -1,4 +1,3 @@
-//qr.js
 const express = require('express');
 const fileUpload = require('express-fileupload');
 const Jimp = require('jimp');
@@ -20,6 +19,7 @@ router.post('/scan', async (req, res) => {
 
     qr.callback = (err, value) => {
       if (err) {
+        console.error('QR Code reading error:', err);
         return res.status(500).send('Error reading QR code.');
       }
 
@@ -28,6 +28,7 @@ router.post('/scan', async (req, res) => {
 
     qr.decode(image.bitmap);
   } catch (error) {
+    console.error('Image processing error:', error);
     res.status(500).send('Error processing image.');
   }
 });
