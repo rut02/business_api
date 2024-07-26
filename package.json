@@ -17,14 +17,17 @@
     "date-fns": "^3.6.0",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
+    "express-fileupload": "^1.5.1",
     "firebase": "^10.9.0",
     "firebase-admin": "^11.0.0",
     "form-data": "^4.0.0",
     "fs": "^0.0.1-security",
     "html-to-image": "^1.11.11",
+    "jimp": "^0.22.12",
     "jsdom": "^24.1.0",
     "multer": "^1.4.5-lts.1",
     "puppeteer": "^22.11.1",
+    "qrcode-reader": "^1.0.4",
     "ws": "^8.18.0"
   },
   "engines": {
