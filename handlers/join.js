@@ -119,8 +119,8 @@ module.exports.updateJoin = async (req, res) => {
 
 module.exports.deleteJoin = async (req, res) => {
     try {
-        const joinId = req.params.id; // รับ Join ID จาก URL parameters
-        const joinRef = db.collection('joins').doc(joinId); 
+        // const joinId = req.params.id; // รับ Join ID จาก URL parameters
+        const joinRef = db.collection('joins').doc(req.params.id);
 
         await joinRef.delete(); // ลบการเข้าร่วมกลุ่ม
 
@@ -129,4 +129,25 @@ module.exports.deleteJoin = async (req, res) => {
         console.error('Error deleting join:', error);
         res.status(500).json({ message: 'Error deleting join: ' + error.message });
     }
+};
+module.exports.deleteUser = async (req, res) => {
+  try {
+    const userId = req.params.id; // รับ ID ของผู้ใช้
+    const groupId = req.params.groupId; // รับ ID ของกลุ่ม
+
+    const joinSnapshot = await db.collection('joins').where('userId', '==', userId).where('groupId', '==', groupId).get();
+    if (joinSnapshot.empty) {
+      console.log('No join found for this user and group');
+      return;
+    }
+    const joinId = joinSnapshot.docs[0].id;
+    const joinRef = db.collection('joins').doc(joinId); 
+
+    await joinRef.delete(); // ลบการเข้าร่วมกลุ่ม
+
+    res.json({ message: 'Join deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting join:', error);
+    res.status(500).json({ message: 'Error deleting join: ' + error.message });
+  }
 };

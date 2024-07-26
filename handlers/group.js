@@ -83,7 +83,6 @@ module.exports.updateGroup = async (req, res) => {
 
         const updatedData = {
             name: req.body.name,
-            ownerId: req.body.ownerId,
         };
 
         await groupRef.update(updatedData); 
