@@ -135,7 +135,7 @@ app.get('/friends/by-friend/:friendId', friendController.getFriendsByFriendsId);
 app.put('/friends/:id', friendController.updateFriend);
 app.put('/friends/status/:userId/:friendId', friendController.updateStatus);
 app.delete('/friends/:id', friendController.deleteFriend);
-app.delete('/friends/all/:id', friendController.deleteAllFriend);
+app.delete('/friends/all/:userId/:friendId', friendController.deleteAllFriend);
 
 const groupController = require('./handlers/group');
 app.post('/groups', groupController.createGroup);
@@ -165,3 +165,5 @@ app.post('/gen_card', gen_cardcontroller.genCard); // สร้างบัต�
 // Import qrScanner routes
 const qrScanner = require('./handlers/qr.js');
 app.use(qrScanner);
+
+
