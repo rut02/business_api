@@ -168,9 +168,10 @@ app.use(qrScanner);
 
 const historyController = require('./handlers/history');
 
-app.get('/history/:id', historyController.getHistoryById);
+// app.get('/history/:id', historyController.getHistoryById);
 app.get('/history/user/:userId', historyController.getHistoryByUserId);
 app.get('/history/friend/:friendId', historyController.getHistoryByFriendId);
 app.get('/history/action/:action', historyController.getHistoryByAction);
+app.get('/friendstats/user/:userId', historyController.getFriendStatsByUserId);
 
 

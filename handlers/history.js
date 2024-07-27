@@ -29,24 +29,6 @@ const logDeleteFriend = async (userId, friendId) => {
     await logHistory(userId, 'delete_friend', friendId);
 };
 
-// ฟังก์ชันดึงประวัติการกระทำตาม ID
-const getHistoryById = async (req, res) => {
-    try {
-        const historyId = req.params.id;
-        const historyDoc = await db.collection('history').doc(historyId).get();
-
-        if (!historyDoc.exists) {
-            res.status(404).json({ message: 'History not found' });
-            return;
-        }
-
-        res.json(historyDoc.data());
-    } catch (error) {
-        console.error('Error getting history:', error);
-        res.status(500).json({ message: 'Error getting history: ' + error.message });
-    }
-};
-
 // ฟังก์ชันดึงประวัติการกระทำตาม userId
 const getHistoryByUserId = async (req, res) => {
     try {
@@ -104,11 +86,29 @@ const getHistoryByAction = async (req, res) => {
     }
 };
 
+// ฟังก์ชันดึงสถิติการเพิ่มและลบเพื่อนของผู้ใช้ตาม userId
+const getFriendStatsByUserId = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const addFriendSnapshot = await db.collection('history').where('userId', '==', userId).where('action', '==', 'add_friend').get();
+        const deleteFriendSnapshot = await db.collection('history').where('userId', '==', userId).where('action', '==', 'delete_friend').get();
+
+        const addCount = addFriendSnapshot.size;
+        const deleteCount = deleteFriendSnapshot.size;
+
+        res.json({ addCount, deleteCount });
+    } catch (error) {
+        console.error('Error getting friend stats:', error);
+        res.status(500).json({ message: 'Error getting friend stats: ' + error.message });
+    }
+};
+
 module.exports = {
     logAddFriend,
     logDeleteFriend,
     getHistoryById,
     getHistoryByUserId,
     getHistoryByFriendId,
-    getHistoryByAction
+    getHistoryByAction,
+    getFriendStatsByUserId
 };
