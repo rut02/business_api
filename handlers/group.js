@@ -97,13 +97,25 @@ module.exports.updateGroup = async (req, res) => {
 module.exports.deleteGroup = async (req, res) => {
     try {
         const groupId = req.params.id; // รับ GroupId
-        const groupRef = db.collection('groups').doc(groupId); 
+        const groupRef = db.collection('groups').doc(groupId);
 
-        await groupRef.delete(); // ลบกลุ่ม
+        // ลบข้อมูลที่มี groupId ตรงกันใน joins
+        const joinsRef = db.collection('joins').where('groupId', '==', groupId);
+        const joinsSnapshot = await joinsRef.get();
+        const batch = db.batch();
 
-        res.json({ message: 'Group deleted successfully' });
+        joinsSnapshot.forEach(doc => {
+            batch.delete(doc.ref);
+        });
+
+        // ลบกลุ่ม
+        await batch.commit();
+        await groupRef.delete(); 
+
+        res.json({ message: 'Group and associated joins deleted successfully' });
     } catch (error) {
         console.error('Error deleting group:', error);
         res.status(500).json({ message: 'Error deleting group: ' + error.message });
     }
 };
+
