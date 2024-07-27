@@ -3,6 +3,7 @@ const admin = require('../admin.js');
 const db = admin.firestore();
 const { formatDate } = require('./function.js');
 const { format } = require('date-fns');
+const history = require('./history.js');
 module.exports.createFriend = async (req, res) => {
     try {
         const friendData = {
@@ -13,6 +14,7 @@ module.exports.createFriend = async (req, res) => {
         };
 
         const friendDocRef = await db.collection('friends').add(friendData);
+        await history.logAddFriend(req.body.userId, req.body.FriendsId);
         res.json({ message: 'Friend added successfully', friendId: friendDocRef.id });
     } catch (error) {
         console.error('Error adding friend:', error);
@@ -162,30 +164,31 @@ module.exports.deleteFriend = async (req, res) => {
 };
 module.exports.deleteAllFriend = async (req, res) => {
     try {
-      const userId = req.params.id; // รับ ID ของผู้ใช้
+      const userId = req.params.userId; // รับ ID ของผู้ใช้
+      const friendId = req.params.friendId;
   
       // ลบข้อมูลจากคอลเลกชัน friends
-      const friendsRef = db.collection('friends').where('FriendsId', '==', userId);
+      const friendsRef = db.collection('friends').where('FriendsId', '==', friendId);
       const friendsSnapshot = await friendsRef.get();
       friendsSnapshot.forEach(doc => {
         doc.ref.delete();
       });
-  
+      await history.logDeleteFriend(userId,friendId);
       // ลบข้อมูลจากคอลเลกชัน requests (requester หรือ responder)
-      const requestsRefRequester = db.collection('requests').where('requesterId', '==', userId);
+      const requestsRefRequester = db.collection('requests').where('requesterId', '==', friendId);
       const requestsSnapshotRequester = await requestsRefRequester.get();
       requestsSnapshotRequester.forEach(doc => {
         doc.ref.delete();
       });
   
-      const requestsRefResponder = db.collection('requests').where('responderId', '==', userId);
+      const requestsRefResponder = db.collection('requests').where('responderId', '==', friendId);
       const requestsSnapshotResponder = await requestsRefResponder.get();
       requestsSnapshotResponder.forEach(doc => {
         doc.ref.delete();
       });
   
       // ลบข้อมูลจากคอลเลกชัน joins
-      const joinsRef = db.collection('joins').where('userId', '==', userId);
+      const joinsRef = db.collection('joins').where('userId', '==', friendId);
       const joinsSnapshot = await joinsRef.get();
       joinsSnapshot.forEach(doc => {
         doc.ref.delete();
