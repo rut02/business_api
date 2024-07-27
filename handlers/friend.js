@@ -160,3 +160,41 @@ module.exports.deleteFriend = async (req, res) => {
         res.status(500).json({ message: 'Error deleting friend: ' + error.message });
     }
 };
+module.exports.deleteAllFriend = async (req, res) => {
+    try {
+      const userId = req.params.id; // รับ ID ของผู้ใช้
+  
+      // ลบข้อมูลจากคอลเลกชัน friends
+      const friendsRef = db.collection('friends').where('FriendsId', '==', userId);
+      const friendsSnapshot = await friendsRef.get();
+      friendsSnapshot.forEach(doc => {
+        doc.ref.delete();
+      });
+  
+      // ลบข้อมูลจากคอลเลกชัน requests (requester หรือ responder)
+      const requestsRefRequester = db.collection('requests').where('requesterId', '==', userId);
+      const requestsSnapshotRequester = await requestsRefRequester.get();
+      requestsSnapshotRequester.forEach(doc => {
+        doc.ref.delete();
+      });
+  
+      const requestsRefResponder = db.collection('requests').where('responderId', '==', userId);
+      const requestsSnapshotResponder = await requestsRefResponder.get();
+      requestsSnapshotResponder.forEach(doc => {
+        doc.ref.delete();
+      });
+  
+      // ลบข้อมูลจากคอลเลกชัน joins
+      const joinsRef = db.collection('joins').where('userId', '==', userId);
+      const joinsSnapshot = await joinsRef.get();
+      joinsSnapshot.forEach(doc => {
+        doc.ref.delete();
+      });
+  
+      res.status(200).json({ message: 'ลบข้อมูลเพื่อนทั้งหมดสำเร็จ' });
+    } catch (error) {
+      console.error("ข้อผิดพลาดในการลบข้อมูลเพื่อน", error);
+      res.status(500).json({ message: 'ข้อผิดพลาดในการลบข้อมูลเพื่อน: ' + error.message });
+    }
+  };
+  
