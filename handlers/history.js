@@ -69,7 +69,7 @@ const getHistoryByFriendId = async (req, res) => {
             const data = doc.data();
             return {
                 ...data,
-                timestamp: new Date(data.timestamp).toLocaleString() // แปลง timestamp
+                timestamp: new Date(data.timestamp)//.toLocaleString() // แปลง timestamp
             };
         });
         res.json(historyList);
@@ -135,7 +135,7 @@ const getHistoryById = async (req, res) => {
         const data = doc.data();
         res.json({
             ...data,
-            timestamp: new Date(data.timestamp).toLocaleString() // แปลง timestamp
+            timestamp: new Date(data.timestamp)//.toLocaleString() // แปลง timestamp
         });
     } catch (error) {
         console.error('Error getting history by id:', error);
