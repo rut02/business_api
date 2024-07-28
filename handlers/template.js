@@ -20,6 +20,8 @@ module.exports.createTemplate = async (req, res) => {
             departmentName: req.body.departmentName,
             logo: req.body.logo,
             status: req.body.status,
+            fontSize: req.body.fontSize,
+            fontColor: req.body.fontColor,
         };
 
         const templateDocRef = await db.collection('templates').add(templateData);
@@ -107,6 +109,8 @@ module.exports.updateTemplate = async (req, res) => {
             departmentName: req.body.departmentName,
             logo: req.body.logo,
             status: req.body.status,
+            fontSize: req.body.fontSize,
+            fontColor: req.body.fontColor
         };
 
         await templateRef.update(updatedData); // อัปเดตข้อมูล
