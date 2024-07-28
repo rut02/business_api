@@ -40,7 +40,13 @@ const getHistoryByUserId = async (req, res) => {
             return;
         }
 
-        const historyList = historySnapshot.docs.map(doc => doc.data());
+        const historyList = historySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                ...data,
+                timestamp: new Date(data.timestamp).toLocaleString() // แปลง timestamp
+            };
+        });
         res.json(historyList);
     } catch (error) {
         console.error('Error getting history by userId:', error);
@@ -59,7 +65,13 @@ const getHistoryByFriendId = async (req, res) => {
             return;
         }
 
-        const historyList = historySnapshot.docs.map(doc => doc.data());
+        const historyList = historySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                ...data,
+                timestamp: new Date(data.timestamp).toLocaleString() // แปลง timestamp
+            };
+        });
         res.json(historyList);
     } catch (error) {
         console.error('Error getting history by friendId:', error);
@@ -78,7 +90,13 @@ const getHistoryByAction = async (req, res) => {
             return;
         }
 
-        const historyList = historySnapshot.docs.map(doc => doc.data());
+        const historyList = historySnapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                ...data,
+                timestamp: new Date(data.timestamp).toLocaleString() // แปลง timestamp
+            };
+        });
         res.json(historyList);
     } catch (error) {
         console.error('Error getting history by action:', error);
@@ -103,12 +121,35 @@ const getFriendStatsByUserId = async (req, res) => {
     }
 };
 
+// ฟังก์ชันดึงประวัติการกระทำตาม id
+const getHistoryById = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const doc = await db.collection('history').doc(id).get();
+
+        if (!doc.exists) {
+            res.status(404).json({ message: 'No history found for this id' });
+            return;
+        }
+
+        const data = doc.data();
+        res.json({
+            ...data,
+            timestamp: new Date(data.timestamp).toLocaleString() // แปลง timestamp
+        });
+    } catch (error) {
+        console.error('Error getting history by id:', error);
+        res.status(500).json({ message: 'Error getting history by id: ' + error.message });
+    }
+};
+
 module.exports = {
     logAddFriend,
     logDeleteFriend,
-    getHistoryById,
+    
     getHistoryByUserId,
     getHistoryByFriendId,
     getHistoryByAction,
-    getFriendStatsByUserId
+    getFriendStatsByUserId,
+    getHistoryById
 };
