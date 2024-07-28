@@ -44,7 +44,7 @@ const getHistoryByUserId = async (req, res) => {
             const data = doc.data();
             return {
                 ...data,
-                timestamp: new Date(data.timestamp).toLocaleString() // แปลง timestamp
+                timestamp: new Date(data.timestamp)//.toLocaleString() // แปลง timestamp
             };
         });
         res.json(historyList);
