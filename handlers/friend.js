@@ -1,64 +1,67 @@
-// friends.js
 const admin = require('../admin.js');
 const db = admin.firestore();
 const { formatDate } = require('./function.js');
 const { format } = require('date-fns');
 const history = require('./history.js');
+
 module.exports.createFriend = async (req, res) => {
     try {
         const friendData = {
             userId: req.body.userId,
-            FriendsId: req.body.FriendsId,
+            friendId: req.body.friendId,
             status: req.body.status,
             time: new Date(),
         };
 
         const friendDocRef = await db.collection('friends').add(friendData);
-        await history.logAddFriend(req.body.userId, req.body.FriendsId);
+        await history.logAddFriend(req.body.userId, req.body.friendId);
         res.json({ message: 'Friend added successfully', friendId: friendDocRef.id });
     } catch (error) {
         console.error('Error adding friend:', error);
         res.status(500).json({ message: 'Error adding friend: ' + error.message });
     }
 };
+
 module.exports.getFriends = async (req, res) => {
     try {
         const friendsSnapshot = await db.collection('friends').get();
         const friends = friendsSnapshot.docs.map(doc => {
             const data = doc.data();
-            data.id = doc.id; // เพิ่ม ID ของเอกสารในข้อมูลที่ส่งกลับ
-            data.time = format(data.time.toDate(), 'yyyy-MM-dd HH:mm:ss'); // แปลงและฟอแมต timestamp ให้เป็น YYYY-MM-DD
+            data.id = doc.id; // Add document ID to the data
+            data.time = format(data.time.toDate(), 'yyyy-MM-dd HH:mm:ss'); // Format timestamp
             return data;
         });
 
-        res.json(friends); // ส่งข้อมูลเพื่อนทั้งหมด
+        res.json(friends); // Send all friends data
     } catch (error) {
         console.error('Error getting friends:', error);
         res.status(500).json({ message: 'Error getting friends: ' + error.message });
     }
 };
+
 module.exports.getFriendById = async (req, res) => {
     try {
-        const friendId = req.params.id; // รับ ID ของเพื่อนจาก URL parameters
-        const friendDoc = await db.collection('friends').doc(friendId).get(); // ดึงเอกสารของเพื่อนโดยใช้ ID
+        const friendId = req.params.id; // Get friend ID from URL parameters
+        const friendDoc = await db.collection('friends').doc(friendId).get(); // Fetch friend document by ID
 
         if (!friendDoc.exists) {
-            res.status(404).json({ message: 'Friend not found' }); // ถ้าไม่พบเพื่อน
+            res.status(404).json({ message: 'Friend not found' }); // If friend not found
             return;
         }
 
         const friendData = friendDoc.data();
-        friendData.id = friendDoc.id; // เพิ่ม ID ของเอกสารเข้าไปในข้อมูลที่ส่งกลับ
-        friendData.time = format(friendData.time.toDate(), 'yyyy-MM-dd HH:mm:ss'); // แปลงและฟอแมต timestamp ให้เป็น YYYY-MM-DD
-        res.json(friendData); // ส่งข้อมูลของเพื่อนกลับไป
+        friendData.id = friendDoc.id; // Add document ID to the data
+        friendData.time = format(friendData.time.toDate(), 'yyyy-MM-dd HH:mm:ss'); // Format timestamp
+        res.json(friendData); // Send friend data
     } catch (error) {
-        console.error('Error getting friend by ID:', error); // ข้อผิดพลาดในการดึงข้อมูลเพื่อน
-        res.status(500).json({ message: 'Error getting friend by ID: ' + error.message }); // ส่งข้อความข้อผิดพลาด
+        console.error('Error getting friend by ID:', error);
+        res.status(500).json({ message: 'Error getting friend by ID: ' + error.message });
     }
 };
+
 module.exports.getFriendsByUserId = async (req, res) => {
     try {
-        const userId = req.params.userId; // รับ UserId
+        const userId = req.params.userId; // Get userId
         const friendsSnapshot = await db.collection('friends').where('userId', '==', userId).get();
 
         if (friendsSnapshot.empty) {
@@ -68,52 +71,53 @@ module.exports.getFriendsByUserId = async (req, res) => {
 
         const friends = friendsSnapshot.docs.map(doc => {
             const data = doc.data();
-            data.id = doc.id; // เพิ่ม ID ของเอกสารในข้อมูลที่ส่งกลับ
-           data.time = format(data.time.toDate(), 'yyyy-MM-dd HH:mm:ss');
+            data.id = doc.id; // Add document ID to the data
+            data.time = format(data.time.toDate(), 'yyyy-MM-dd HH:mm:ss'); // Format timestamp
             return data;
         });
 
-        res.json(friends); // ส่งข้อมูลเพื่อนทั้งหมดสำหรับผู้ใช้ที่ระบุ
+        res.json(friends); // Send all friends data for specified user
     } catch (error) {
         console.error('Error getting friends by user ID:', error);
         res.status(500).json({ message: 'Error getting friends by user ID: ' + error.message });
     }
 };
 
-module.exports.getFriendsByFriendsId = async (req, res) => {
+module.exports.getFriendsByFriendId = async (req, res) => {
     try {
-        const friendsId = req.params.friendId; // รับ FriendsId
-        const friendsSnapshot = await db.collection('friends').where('FriendsId', '==', friendsId).get();
+        const friendId = req.params.friendId; // Get friendId
+        const friendsSnapshot = await db.collection('friends').where('friendId', '==', friendId).get();
 
         if (friendsSnapshot.empty) {
-            res.status(404).json({ message: 'No friends found for this FriendsId' });
+            res.status(404).json({ message: 'No friends found for this friendId' });
             return;
         }
 
         const friends = friendsSnapshot.docs.map(doc => {
             const data = doc.data();
-            data.id = doc.id; // เพิ่ม ID ของเอกสารในข้อมูลที่ส่งกลับ
-            data.time = formatDate(data.time); // แปลงและฟอแมต timestamp ให้เป็น YYYY-MM-DD
+            data.id = doc.id; // Add document ID to the data
+            data.time = formatDate(data.time); // Format timestamp
             return data;
         });
 
-        res.json(friends); // ส่งข้อมูลเพื่อนทั้งหมดสำหรับ FriendsId ที่ระบุ
+        res.json(friends); // Send all friends data for specified friendId
     } catch (error) {
-        console.error('Error getting friends by FriendsId:', error);
-        res.status(500).json({ message: 'Error getting friends by FriendsId: ' + error.message });
+        console.error('Error getting friends by friendId:', error);
+        res.status(500).json({ message: 'Error getting friends by friendId: ' + error.message });
     }
 };
+
 module.exports.updateStatus = async (req, res) => {
     try {
-        const friendId = req.params.friendId; // รับ ID ของเพื่อน
+        const friendId = req.params.friendId; // Get friendId
         const userId = req.params.userId;
         const updatedData = {
-            status: req.body.status, // อัปเดตสถานะ (0=ธรรมดา, 1=โปรด)
+            status: req.body.status, // Update status (0=normal, 1=favorite)
         };
 
         const friendRef = db.collection('friends')
             .where('userId', '==', userId)
-            .where('FriendsId', '==', friendId);
+            .where('friendId', '==', friendId);
 
         const snapshot = await friendRef.get();
         if (snapshot.empty) {
@@ -129,15 +133,13 @@ module.exports.updateStatus = async (req, res) => {
         console.error('Error updating friend:', error);
         res.status(500).json({ message: 'Error updating friend: ' + error.message });
     }
-}
-
-
+};
 
 module.exports.updateFriend = async (req, res) => {
     try {
-        const friendId = req.params.id; // รับ ID ของเพื่อน
+        const friendId = req.params.id; // Get friendId
         const updatedData = {
-            status: req.body.status, // อัปเดตสถานะ (0=ธรรมดา, 1=โปรด)
+            status: req.body.status, // Update status (0=normal, 1=favorite)
         };
 
         const friendRef = db.collection('friends').doc(friendId);
@@ -149,12 +151,13 @@ module.exports.updateFriend = async (req, res) => {
         res.status(500).json({ message: 'Error updating friend: ' + error.message });
     }
 };
+
 module.exports.deleteFriend = async (req, res) => {
     try {
-        const friendId = req.params.id; // รับ ID ของเพื่อน
+        const friendId = req.params.id; // Get friendId
         const friendRef = db.collection('friends').doc(friendId);
 
-        await friendRef.delete(); // ลบเพื่อน
+        await friendRef.delete(); // Delete friend
 
         res.json({ message: 'Friend deleted successfully' });
     } catch (error) {
@@ -162,48 +165,55 @@ module.exports.deleteFriend = async (req, res) => {
         res.status(500).json({ message: 'Error deleting friend: ' + error.message });
     }
 };
+
 module.exports.deleteAllFriend = async (req, res) => {
     try {
-      const userId = req.params.userId; // รับ ID ของผู้ใช้
-      const friendId = req.params.friendId;
-  
-      // ลบข้อมูลจากคอลเลกชัน friends
-      const friendsRef = db.collection('friends').where('FriendsId', '==', friendId).where("userId",'==',userId);
-      const friendsSnapshot = await friendsRef.get();
-      friendsSnapshot.forEach(doc => {
-        doc.ref.delete();
-      });
+        const userId = req.params.userId; // Get userId
+        const friendId = req.params.friendId;
 
-      const friendsRef2 = db.collection('friends').where('userId', '==', friendId).where("FriendsId",'==',userId);
-      const friendsSnapshot2 = await friendsRef2.get();
-      friendsSnapshot2.forEach(doc => {
-        doc.ref.delete();
-      });
-      await history.logDeleteFriend(userId,friendId);
-      // ลบข้อมูลจากคอลเลกชัน requests (requester หรือ responder)
-      const requestsRefRequester = db.collection('requests').where('requesterId', '==', friendId);
-      const requestsSnapshotRequester = await requestsRefRequester.get();
-      requestsSnapshotRequester.forEach(doc => {
-        doc.ref.delete();
-      });
-  
-      const requestsRefResponder = db.collection('requests').where('responderId', '==', friendId);
-      const requestsSnapshotResponder = await requestsRefResponder.get();
-      requestsSnapshotResponder.forEach(doc => {
-        doc.ref.delete();
-      });
-  
-      // ลบข้อมูลจากคอลเลกชัน joins
-      const joinsRef = db.collection('joins').where('userId', '==', friendId);
-      const joinsSnapshot = await joinsRef.get();
-      joinsSnapshot.forEach(doc => {
-        doc.ref.delete();
-      });
-  
-      res.status(200).json({ message: 'ลบข้อมูลเพื่อนทั้งหมดสำเร็จ' });
+        // Batch for deleting documents
+        const batch = db.batch();
+
+        // Delete documents from the friends collection
+        const friendsSnapshot = await db.collection('friends')
+            .where('friendId', '==', friendId)
+            .where('userId', '==', userId).get();
+        friendsSnapshot.forEach(doc => {
+            batch.delete(doc.ref);
+        });
+
+        const friendsSnapshot2 = await db.collection('friends')
+            .where('userId', '==', friendId)
+            .where('friendId', '==', userId).get();
+        friendsSnapshot2.forEach(doc => {
+            batch.delete(doc.ref);
+        });
+
+        await history.logDeleteFriend(userId, friendId);
+
+        // Delete documents from the requests collection (requester or responder)
+        const requestsSnapshotRequester = await db.collection('requests').where('requesterId', '==', friendId).get();
+        requestsSnapshotRequester.forEach(doc => {
+            batch.delete(doc.ref);
+        });
+
+        const requestsSnapshotResponder = await db.collection('requests').where('responderId', '==', friendId).get();
+        requestsSnapshotResponder.forEach(doc => {
+            batch.delete(doc.ref);
+        });
+
+        // Delete documents from the joins collection
+        const joinsSnapshot = await db.collection('joins').where('userId', '==', friendId).get();
+        joinsSnapshot.forEach(doc => {
+            batch.delete(doc.ref);
+        });
+
+        // Commit the batch
+        await batch.commit();
+
+        res.status(200).json({ message: 'ลบข้อมูลเพื่อนทั้งหมดสำเร็จ' });
     } catch (error) {
-      console.error("ข้อผิดพลาดในการลบข้อมูลเพื่อน", error);
-      res.status(500).json({ message: 'ข้อผิดพลาดในการลบข้อมูลเพื่อน: ' + error.message });
+        console.error("ข้อผิดพลาดในการลบข้อมูลเพื่อน", error);
+        res.status(500).json({ message: 'ข้อผิดพลาดในการลบข้อมูลเพื่อน: ' + error.message });
     }
-  };
-  
+};
