@@ -168,9 +168,15 @@ module.exports.deleteAllFriend = async (req, res) => {
       const friendId = req.params.friendId;
   
       // ลบข้อมูลจากคอลเลกชัน friends
-      const friendsRef = db.collection('friends').where('FriendsId', '==', friendId);
+      const friendsRef = db.collection('friends').where('FriendsId', '==', friendId).where("userId",'==',userId);
       const friendsSnapshot = await friendsRef.get();
       friendsSnapshot.forEach(doc => {
+        doc.ref.delete();
+      });
+
+      const friendsRef2 = db.collection('friends').where('userId', '==', friendId).where("FriendsId",'==',userId);
+      const friendsSnapshot2 = await friendsRef2.get();
+      friendsSnapshot2.forEach(doc => {
         doc.ref.delete();
       });
       await history.logDeleteFriend(userId,friendId);
