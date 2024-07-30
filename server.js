@@ -131,7 +131,7 @@ app.post('/friends', friendController.createFriend);
 app.get('/friends', friendController.getFriends);
 app.get('/friends/:id', friendController.getFriendById);
 app.get('/friends/by-user/:userId', friendController.getFriendsByUserId);
-app.get('/friends/by-friend/:friendId', friendController.getFriendsByFriendsId);
+app.get('/friends/by-friend/:friendId', friendController.getFriendsByFriendId);
 app.put('/friends/:id', friendController.updateFriend);
 app.put('/friends/status/:userId/:friendId', friendController.updateStatus);
 app.delete('/friends/:id', friendController.deleteFriend);
