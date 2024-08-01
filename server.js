@@ -74,6 +74,8 @@ app.get('/users/by-department/:department', userController.getUsersByDepartment)
 app.get('/users/by-companybranch/:branch', userController.getUsersByCompanyBranch);
 app.put('/users/:id', userController.updateUser);
 app.put('/users/:id/address', userController.updateAddress);
+app.put('/users/changepass/:id/password', userController.changePassword);
+app.put('/users/update/:id', userController.updateUserApp);
 app.delete('/users/:id', userController.deleteUser);
 
 const companyBranchController = require('./handlers/companybranch');
