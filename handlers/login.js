@@ -49,8 +49,8 @@ module.exports.login = async (req, res) => {
             if (isValidPassword) {
                 
                 let role = 'user';
-                if (userData.companybranch && userData.position === 'hr') {
-                    role = 'hr';
+                if (userData.companybranch && userData.department) {
+                    role = 'employee';
                 }
                 
                 res.json({ 

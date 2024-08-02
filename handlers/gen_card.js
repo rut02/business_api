@@ -30,9 +30,8 @@ async function drawCard(data, outputPath) {
 
     // วาดข้อมูล
     ctx.fillStyle = '#333';
-    ctx.font = 'bold 20px tahoma';
+    ctx.font = 'bold 20px Arial';
     ctx.fillText(`${data.firstname} ${data.lastname}`, 140, 40);
-    console.log(data.firstname, data.lastname);
 
     ctx.font = '16px Arial';
     ctx.fillText(`Position: ${data.position}`, 140, 70);
