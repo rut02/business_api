@@ -859,7 +859,7 @@ module.exports.updateUser = async (req, res) => {
     const userId = req.params.id;
     const userRef = db.collection('users').doc(userId);
     const userSnapshot = await userRef.get();
-
+    console.log(req.body);
     if (!userSnapshot.exists) {
 
       res.status(404).json({ message: 'User not found' });
