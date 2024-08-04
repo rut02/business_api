@@ -2,10 +2,18 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const FormData = require('form-data');
-const { createCanvas, loadImage } = require('canvas');
+const { createCanvas, loadImage, registerFont } = require('canvas');
 const admin = require('../admin.js');
 const db = admin.firestore();
 const api = "https://business-api-638w.onrender.com";
+
+// Load custom font
+const fontPath = path.join(__dirname, './static/NotoSans_Condensed-Bold.ttf');
+if (fs.existsSync(fontPath)) {
+    registerFont(fontPath, { family: 'NotoSans' });
+} else {
+    console.error('Font file not found:', fontPath);
+}
 
 // ฟังก์ชันวาด Business Card
 async function drawCard(data, outputPath) {
@@ -30,10 +38,11 @@ async function drawCard(data, outputPath) {
 
     // วาดข้อมูล
     ctx.fillStyle = '#333';
-    ctx.font = 'bold 20px Arial';
+    ctx.font = 'bold 20px NotoSans';
     ctx.fillText(`${data.firstname} ${data.lastname}`, 140, 40);
+    console.log(data.firstname, data.lastname);
 
-    ctx.font = '16px Arial';
+    ctx.font = '16px NotoSans';
     ctx.fillText(`Position: ${data.position}`, 140, 70);
     ctx.fillText(`Birthdate: ${data.birthdate}`, 140, 100);
     ctx.fillText(`Gender: ${data.gender}`, 140, 130);
