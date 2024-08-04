@@ -77,7 +77,7 @@ app.put('/users/:id/address', userController.updateAddress);
 app.put('/users/changepass/:id/password', userController.changePassword);
 app.put('/users/update/:id', userController.updateUserApp);
 app.delete('/users/:id', userController.deleteUser);
-
+app.post('/users/check-email', userController.checkEmail);
 const companyBranchController = require('./handlers/companybranch');
 app.post('/companybranches', companyBranchController.createCompanybranch);
 app.get('/companybranches', companyBranchController.getCompanybranches);

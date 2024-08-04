@@ -8,7 +8,7 @@ const db = admin.firestore();
 const api = "https://business-api-638w.onrender.com";
 
 // Load custom font
-registerFont(path.join(__dirname, './static/NotoSans_Condensed-Bold.ttf'), { family: 'NotoSans' });
+// registerFont(path.join(__dirname, './static/NotoSans_Condensed-Bold.ttf'), { family: 'NotoSans' });
 
 // ฟังก์ชันวาด Business Card
 async function drawCard(data, outputPath) {
@@ -33,11 +33,11 @@ async function drawCard(data, outputPath) {
 
     // วาดข้อมูล
     ctx.fillStyle = '#333';
-    ctx.font = 'bold 20px NotoSans';
+    ctx.font = '20px tahoma';
     ctx.fillText(`${data.firstname} ${data.lastname}`, 140, 40);
     console.log(data.firstname, data.lastname);
 
-    ctx.font = '16px NotoSans';
+    ctx.font = '16px tahoma';
     ctx.fillText(`Position: ${data.position}`, 140, 70);
     ctx.fillText(`Birthdate: ${data.birthdate}`, 140, 100);
     ctx.fillText(`Gender: ${data.gender}`, 140, 130);

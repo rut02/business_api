@@ -967,6 +967,23 @@ module.exports.updateUserApp = async (req, res) => {
     res.status(500).json({ message: 'Error updating user: ' + error.message });
   }
 };
+module.exports.checkEmail = async (req, res) => {
+  try {
+    const email = req.body.email;
+    const companiesEmailSnapshot = await db.collection('companies').where('email', '==', email).get();
+    const usersEmailSnapshot = await db.collection('users').where('email', '==', email).get();
+    const adminsEmailSnapshot = await db.collection('admin').where('email', '==', email).get();
+    // ตรวจสอบว่าอีเมลนี้มีอยู่ในระบบแล้วหรือไม่
+    if (!companiesEmailSnapshot.empty || !usersEmailSnapshot.empty || !adminsEmailSnapshot.empty) {
+      res.status(400).json({ message: 'Email already exists' });
+      return;
+    }
+    res.status(200).json({ message: 'Email available' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error checking email: ' + error.message });
+  }
+}
 module.exports.changePassword = async (req, res) => {
   try {
     const userId = req.params.id;
