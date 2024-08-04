@@ -191,6 +191,21 @@ module.exports.updateCompany = async (req, res) => {
             return;
         }
 
+        // ตรวจสอบความถูกต้องของอีเมล
+        const email = req.body.email;
+        const currentEmail = companySnapshot.data().email;
+
+        if (email !== currentEmail) {
+            const companiesEmailSnapshot = await db.collection('companies').where('email', '==', email).get();
+            const employeesEmailSnapshot = await db.collection('users').where('email', '==', email).get();
+            const adminsEmailSnapshot = await db.collection('admin').where('email', '==', email).get();
+            // ตรวจสอบว่าอีเมลนี้มีอยู่ในระบบแล้วหรือไม่
+            if (!companiesEmailSnapshot.empty || !employeesEmailSnapshot.empty|| !adminsEmailSnapshot.empty) {
+                res.status(400).json({ message: 'Email already exists' });
+                return;
+            }
+        }
+
         // รับข้อมูลใหม่ที่จะอัปเดต
         const updatedData = {
             businessType: req.body.businessType,
@@ -198,41 +213,13 @@ module.exports.updateCompany = async (req, res) => {
             website: req.body.website,
             yearFounded: new Date(req.body.yearFounded),
             logo: req.body.logo,
-            email: req.body.email,
+            email: email,
             password: req.body.password,
             status: req.body.status,
-            
-            
         };
 
         // ทำการอัปเดตข้อมูลบริษัทใน Firestore
         await companyRef.update(updatedData);
-
-        // // ตรวจสอบความถูกต้องของอีเมล
-        // const email = req.body.email;
-        // if (email) {
-        //     const companiesEmailSnapshot = await db.collection('companies').where('email', '==', email).get();
-        //     const employeesEmailSnapshot = await db.collection('users').where('email', '==', email).get();
-
-        //     // ตรวจสอบว่าอีเมลนี้มีอยู่ในระบบแล้วหรือไม่
-        //     if (!companiesEmailSnapshot.empty || !employeesEmailSnapshot.empty) {
-        //         res.status(400).json({ message: 'Email already exists. Please choose a different email.' });
-        //         return;
-        //     }
-
-        //     // อัปเดตอีเมลในบริษัท
-        //     await companyRef.update({ email: email });
-        // }
-
-        // // อัปเดตที่อยู่
-        // const addressData = {
-        //     subdistrict: req.body.subdistrict,
-        //     district: req.body.district,
-        //     province: req.body.province,
-        //     country: req.body.country
-        // };
-        // const addressRef = companyRef.collection('address').doc();
-        // await addressRef.set(addressData);
 
         res.json({ message: 'Company updated successfully' });
     } catch (error) {
@@ -240,6 +227,7 @@ module.exports.updateCompany = async (req, res) => {
         res.status(500).json({ message: 'Error updating company: ' + error.message });
     }
 };
+
 module.exports.updateStatus = async (req, res) => {
     try {
         const companyId = req.params.id;

@@ -853,40 +853,42 @@ module.exports.getUsersByCompanyAndDepartmentName = async (req, res) => {
     res.status(500).json({ message: 'ข้อผิดพลาดในการดึงข้อมูลผู้ใช้: ' + error.message });
   }
 };
-
 module.exports.updateUser = async (req, res) => {
   try {
     const userId = req.params.id;
     const userRef = db.collection('users').doc(userId);
     const userSnapshot = await userRef.get();
-    console.log(req.body);
-    if (!userSnapshot.exists) {
 
+    if (!userSnapshot.exists) {
       res.status(404).json({ message: 'User not found' });
       return;
     }
 
-    const currentUserData = userSnapshot.data();
-    const email = req.body.email;
+  
 
+     // ตรวจสอบความถูกต้องของอีเมล
+     const email = req.body.email;
+     const currentEmail = userSnapshot.data().email;
 
-    const companiesEmailSnapshot = await db.collection('companies').where('email', '==', email).get();
-    const usersEmailSnapshot = await db.collection('users').where('email', '==', email).get();
+     if (email !== currentEmail) {
+         const companiesEmailSnapshot = await db.collection('companies').where('email', '==', email).get();
+         const employeesEmailSnapshot = await db.collection('users').where('email', '==', email).get();
+         const adminsEmailSnapshot = await db.collection('admin').where('email', '==', email).get();
+         // ตรวจสอบว่าอีเมลนี้มีอยู่ในระบบแล้วหรือไม่
+         if (!companiesEmailSnapshot.empty || !employeesEmailSnapshot.empty|| !adminsEmailSnapshot.empty) {
+             res.status(400).json({ message: 'Email already exists' });
+             return;
+         }
+     }
 
-    if ((!companiesEmailSnapshot.empty && currentUserData.email !== email) ||
-      (!usersEmailSnapshot.empty && usersEmailSnapshot.docs.some(doc => doc.id !== userId))) {
-      res.status(400).json({ message: 'Email already exists' });
-      return;
-    }
     const updatedData = {
       firstname: req.body.firstname,
       lastname: req.body.lastname,
-      email: email,
+      email: newEmail,
       gender: req.body.gender,
       birthdate: new Date(req.body.birthdate),
       companybranch: req.body.companybranch || null,
       department: req.body.department || null,
-      // positionTemplate: req.body.positionTemplate,
       phone: req.body.phone,
       position: req.body.position,
       startwork: req.body.startwork || null,
@@ -909,6 +911,7 @@ module.exports.updateUser = async (req, res) => {
     res.status(500).json({ message: 'Error updating user: ' + error.message });
   }
 };
+
 module.exports.updateUserApp = async (req, res) => {
   try {
     const userId = req.params.id;
