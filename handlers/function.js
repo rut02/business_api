@@ -35,6 +35,9 @@ module.exports.calculateAge = (birthdate) => {
     if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
       age--;
     }
+    if (age == 0) {
+      age = 1;
+    }
     return age;
   };
   module.exports.deleteDocumentWithSubcollectionsAndReferences = async (docRef, linkedCollections = {}) => {
