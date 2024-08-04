@@ -34,6 +34,7 @@
     "node": "20.12.2"
   },
   "devDependencies": {
+    "font-face": "^2.3.4",
     "nodemon": "^3.1.0"
   }
 }

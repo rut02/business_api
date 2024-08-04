@@ -884,7 +884,7 @@ module.exports.updateUser = async (req, res) => {
     const updatedData = {
       firstname: req.body.firstname,
       lastname: req.body.lastname,
-      email: newEmail,
+      email: email,
       gender: req.body.gender,
       birthdate: new Date(req.body.birthdate),
       companybranch: req.body.companybranch || null,
