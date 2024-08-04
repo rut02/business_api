@@ -2,57 +2,30 @@ const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 const FormData = require('form-data');
-const { createCanvas, loadImage, registerFont } = require('canvas');
+const puppeteer = require('puppeteer');
 const admin = require('../admin.js');
 const db = admin.firestore();
 const api = "https://business-api-638w.onrender.com";
 
-// Load custom font
-const fontPath = path.join(__dirname, './static/NotoSans_Condensed-Bold.ttf');
-if (fs.existsSync(fontPath)) {
-    registerFont(fontPath, { family: 'NotoSans' });
-} else {
-    console.error('Font file not found:', fontPath);
-}
+// ฟังก์ชันสร้าง Business Card จาก HTML และบันทึกเป็นรูปภาพ
+async function createCardImage(data, outputPath) {
+    const htmlContent = fs.readFileSync(path.join(__dirname, 'card.html'), 'utf-8')
+        .replace('{{PROFILE}}', data.profile)
+        .replace('{{FIRSTNAME}}', data.firstname)
+        .replace('{{LASTNAME}}', data.lastname)
+        .replace('{{POSITION}}', data.position)
+        .replace('{{BIRTHDATE}}', data.birthdate)
+        .replace('{{GENDER}}', data.gender)
+        .replace('{{PHONE}}', data.phone)
+        .replace('{{EMAIL}}', data.email)
+        .replace('{{ADDRESS}}', data.address);
 
-// ฟังก์ชันวาด Business Card
-async function drawCard(data, outputPath) {
-    const width = 600;
-    const height = 300;
-    const canvas = createCanvas(width, height);
-    const ctx = canvas.getContext('2d');
-
-    // วาดพื้นหลัง
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(0, 0, width, height);
-
-    // วาดภาพโปรไฟล์
-    if (data.profile) {
-        try {
-            const profileImage = await loadImage(data.profile);
-            ctx.drawImage(profileImage, 20, 20, 100, 100);
-        } catch (err) {
-            console.error('Error loading profile image:', err);
-        }
-    }
-
-    // วาดข้อมูล
-    ctx.fillStyle = '#333';
-    ctx.font = 'bold 20px NotoSans';
-    ctx.fillText(`${data.firstname} ${data.lastname}`, 140, 40);
-    console.log(data.firstname, data.lastname);
-
-    ctx.font = '16px NotoSans';
-    ctx.fillText(`Position: ${data.position}`, 140, 70);
-    ctx.fillText(`Birthdate: ${data.birthdate}`, 140, 100);
-    ctx.fillText(`Gender: ${data.gender}`, 140, 130);
-    ctx.fillText(`Phone: ${data.phone}`, 140, 160);
-    ctx.fillText(`Email: ${data.email}`, 140, 190);
-    ctx.fillText(`Address: ${data.address}`, 140, 220);
-
-    // บันทึกเป็นไฟล์ภาพ
-    const buffer = canvas.toBuffer('image/png');
-    fs.writeFileSync(outputPath, buffer);
+    const browser = await puppeteer.launch();
+    const page = await browser.newPage();
+    await page.setContent(htmlContent);
+    await page.setViewport({ width: 600, height: 300 });
+    await page.screenshot({ path: outputPath, fullPage: true });
+    await browser.close();
 }
 
 // ฟังก์ชันอัปโหลดภาพไปยังเซิร์ฟเวอร์
@@ -64,7 +37,6 @@ async function uploadImage(filePath, userId) {
         form.append('folder', 'business_card');
         form.append('collection', 'users');
 
-        // ใช้ฟังก์ชันแบบอะซิงโครนัสเพื่อคำนวณ Content-Length
         const headers = {
             ...form.getHeaders(),
             'Content-Length': await new Promise((resolve, reject) => {
@@ -107,7 +79,7 @@ async function createBusinessCard(data) {
     }
 
     const imagePath = path.join(__dirname, 'business-card.png');
-    await drawCard(data, imagePath);
+    await createCardImage(data, imagePath);
 
     const uploadResult = await uploadImage(imagePath, data.id);
     console.log('Upload result:', uploadResult);
