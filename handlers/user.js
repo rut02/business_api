@@ -895,13 +895,13 @@ module.exports.updateUser = async (req, res) => {
       address: req.body.subdistrict + "," + req.body.district + "," + req.body.province + "," + req.body.country,
     };
 
-    if (req.body.password) {
-      const isSamePassword = await bcrypt.compare(req.body.password, currentUserData.password);
-      if (!isSamePassword) {
-        const hashedPassword = await bcrypt.hash(req.body.password, 10);
-        updatedData.password = hashedPassword;
-      }
-    }
+    // if (req.body.password) {
+    //   const isSamePassword = await bcrypt.compare(req.body.password, currentUserData.password);
+    //   if (!isSamePassword) {
+    //     const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    //     updatedData.password = hashedPassword;
+    //   }
+    // }
 
     await userRef.update(updatedData); // อัปเดตข้อมูลผู้ใช้
 
