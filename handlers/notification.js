@@ -23,7 +23,7 @@ async function sendNotification(req, res) {
   try {
     const response = await admin.messaging().send(message);
     console.log('Successfully sent message:', response);
-    res.status(200).send('Notification sent successfully');
+    res.status(200).send('Notification sent successfully',req.body);
   } catch (error) {
     console.error('Error sending message:', error);
     res.status(500).send('Error sending notification');
