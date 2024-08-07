@@ -25,7 +25,7 @@ async function drawCard(data, outputPath) {
     if (data.profile) {
         try {
             const profileImage = await loadImage(data.profile);
-            ctx.drawImage(profileImage, 20, 20, 100, 100);
+            ctx.drawImage(profileImage, 20, 20, 120, 120); // เพิ่มขนาดของภาพโปรไฟล์
         } catch (err) {
             console.error('Error loading profile image:', err);
         }
@@ -33,17 +33,16 @@ async function drawCard(data, outputPath) {
 
     // วาดข้อมูล
     ctx.fillStyle = '#333';
-    ctx.font = '20px tahoma';
-    ctx.fillText(`${data.firstname} ${data.lastname}`, 140, 40);
-    console.log(data.firstname, data.lastname);
+    ctx.font = '24px tahoma'; // เพิ่มขนาดของฟอนต์
+    ctx.fillText(`${data.firstname} ${data.lastname}`, 160, 50); // ปรับตำแหน่งของชื่อ
 
-    ctx.font = '16px tahoma';
-    ctx.fillText(`Position: ${data.position}`, 140, 70);
-    ctx.fillText(`Birthdate: ${data.birthdate}`, 140, 100);
-    ctx.fillText(`Gender: ${data.gender}`, 140, 130);
-    ctx.fillText(`Phone: ${data.phone}`, 140, 160);
-    ctx.fillText(`Email: ${data.email}`, 140, 190);
-    ctx.fillText(`Address: ${data.address}`, 140, 220);
+    ctx.font = '18px tahoma'; // ลดขนาดของฟอนต์
+    ctx.fillText(`Position: ${data.position}`, 160, 80);
+    ctx.fillText(`Birthdate: ${data.birthdate}`, 160, 110);
+    ctx.fillText(`Gender: ${data.gender}`, 160, 140);
+    ctx.fillText(`Phone: ${data.phone}`, 160, 170);
+    ctx.fillText(`Email: ${data.email}`, 160, 200);
+    ctx.fillText(`Address: ${data.address}`, 160, 230);
 
     // บันทึกเป็นไฟล์ภาพ
     const buffer = canvas.toBuffer('image/png');
