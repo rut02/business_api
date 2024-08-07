@@ -12,20 +12,20 @@ const api = "https://business-api-638w.onrender.com";
 
 // ฟังก์ชันวาด Business Card
 async function drawCard(data, outputPath) {
-    const width = 950;
-    const height = 550;
-    const canvas = createCanvas(width, height);
+    const canvasWidth = 650;
+    const canvasHeight = 450;
+    const canvas = createCanvas(canvasWidth, canvasHeight);
     const ctx = canvas.getContext('2d');
   
     // Draw the background
     ctx.fillStyle = '#fff';
-    ctx.fillRect(0, 0, width, height);
+    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
   
     // Draw profile image
     if (data.profile) {
       try {
         const profileImage = await loadImage(data.profile);
-        ctx.drawImage(profileImage, (width - 150) / 2, 50, 150, 150); // วางภาพโปรไฟล์ตรงกลาง
+        ctx.drawImage(profileImage, 35, 95, 150, 150); // Increase the size of the profile image
       } catch (err) {
         console.error('Error loading profile image:', err);
       }
@@ -33,23 +33,27 @@ async function drawCard(data, outputPath) {
   
     // Draw user data
     ctx.fillStyle = '#333';
-    ctx.font = '32px tahoma'; 
-    ctx.textAlign = 'center'; // ปรับตำแหน่งข้อความให้ตรงกลาง
-    ctx.fillText(`${data.firstname} ${data.lastname}`, width / 2, 250);
+    ctx.font = '32px Tahoma'; // Increase font size
+    ctx.textAlign = 'left'; // Add text alignment
   
-    ctx.font = '24px tahoma'; 
-    ctx.textAlign = 'center'; 
-    ctx.fillText(`Position: ${data.position}`, width / 2, 300);
-    ctx.fillText(`Birthdate: ${data.birthdate}`, width / 2, 340);
-    ctx.fillText(`Gender: ${data.gender}`, width / 2, 380);
-    ctx.fillText(`Phone: ${data.phone}`, width / 2, 420);
-    ctx.fillText(`Email: ${data.email}`, width / 2, 460);
-    ctx.fillText(`Address: ${data.address}`, width / 2, 500);
+    const userDataX = 230;
+    const userDataY = 130;
+    ctx.fillText(`${data.firstname} ${data.lastname}`, userDataX, userDataY-10); // Adjust position
+  
+    ctx.font = '24px Tahoma'; // Decrease font size
+    const userDataSpacing = 40;
+    ctx.fillText(`Position: ${data.position}`, userDataX, userDataY + userDataSpacing);
+    ctx.fillText(`Birthdate: ${data.birthdate}`, userDataX, userDataY + userDataSpacing * 2);
+    ctx.fillText(`Gender: ${data.gender}`, userDataX, userDataY + userDataSpacing * 3);
+    ctx.fillText(`Phone: ${data.phone}`, userDataX, userDataY + userDataSpacing * 4);
+    ctx.fillText(`Email: ${data.email}`, userDataX, userDataY + userDataSpacing * 5);
+    ctx.fillText(`Address: ${data.address}`, userDataX, userDataY + userDataSpacing * 6);
   
     // Save the canvas as a PNG image
     const buffer = canvas.toBuffer('image/png');
     fs.writeFileSync(outputPath, buffer);
   }
+
 // ฟังก์ชันอัปโหลดภาพไปยังเซิร์ฟเวอร์
 async function uploadImage(filePath, userId) {
     try {
