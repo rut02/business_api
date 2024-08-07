@@ -25,7 +25,7 @@ async function drawCard(data, outputPath) {
     if (data.profile) {
       try {
         const profileImage = await loadImage(data.profile);
-        ctx.drawImage(profileImage, 20, 20, 150, 150); // Increase the size of the profile image
+        ctx.drawImage(profileImage, (width - 150) / 2, 50, 150, 150); // วางภาพโปรไฟล์ตรงกลาง
       } catch (err) {
         console.error('Error loading profile image:', err);
       }
@@ -33,22 +33,23 @@ async function drawCard(data, outputPath) {
   
     // Draw user data
     ctx.fillStyle = '#333';
-    ctx.font = '32px tahoma'; // Increase font size
-    ctx.fillText(`${data.firstname} ${data.lastname}`, 200, 100); // Adjust position
+    ctx.font = '32px tahoma'; 
+    ctx.textAlign = 'center'; // ปรับตำแหน่งข้อความให้ตรงกลาง
+    ctx.fillText(`${data.firstname} ${data.lastname}`, width / 2, 250);
   
-    ctx.font = '24px tahoma'; // Decrease font size
-    ctx.fillText(`Position: ${data.position}`, 200, 160);
-    ctx.fillText(`Birthdate: ${data.birthdate}`, 200, 200);
-    ctx.fillText(`Gender: ${data.gender}`, 200, 240);
-    ctx.fillText(`Phone: ${data.phone}`, 200, 280);
-    ctx.fillText(`Email: ${data.email}`, 200, 320);
-    ctx.fillText(`Address: ${data.address}`, 200, 360);
+    ctx.font = '24px tahoma'; 
+    ctx.textAlign = 'center'; 
+    ctx.fillText(`Position: ${data.position}`, width / 2, 300);
+    ctx.fillText(`Birthdate: ${data.birthdate}`, width / 2, 340);
+    ctx.fillText(`Gender: ${data.gender}`, width / 2, 380);
+    ctx.fillText(`Phone: ${data.phone}`, width / 2, 420);
+    ctx.fillText(`Email: ${data.email}`, width / 2, 460);
+    ctx.fillText(`Address: ${data.address}`, width / 2, 500);
   
     // Save the canvas as a PNG image
     const buffer = canvas.toBuffer('image/png');
     fs.writeFileSync(outputPath, buffer);
   }
-
 // ฟังก์ชันอัปโหลดภาพไปยังเซิร์ฟเวอร์
 async function uploadImage(filePath, userId) {
     try {
