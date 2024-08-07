@@ -16,38 +16,38 @@ async function drawCard(data, outputPath) {
     const height = 550;
     const canvas = createCanvas(width, height);
     const ctx = canvas.getContext('2d');
-
-    // วาดพื้นหลัง
+  
+    // Draw the background
     ctx.fillStyle = '#fff';
     ctx.fillRect(0, 0, width, height);
-
-    // วาดภาพโปรไฟล์
+  
+    // Draw profile image
     if (data.profile) {
-        try {
-            const profileImage = await loadImage(data.profile);
-            ctx.drawImage(profileImage, 20, 20, 120, 120); // เพิ่มขนาดของภาพโปรไฟล์
-        } catch (err) {
-            console.error('Error loading profile image:', err);
-        }
+      try {
+        const profileImage = await loadImage(data.profile);
+        ctx.drawImage(profileImage, 20, 20, 150, 150); // Increase the size of the profile image
+      } catch (err) {
+        console.error('Error loading profile image:', err);
+      }
     }
-
-    // วาดข้อมูล
+  
+    // Draw user data
     ctx.fillStyle = '#333';
-    ctx.font = '24px tahoma'; // เพิ่มขนาดของฟอนต์
-    ctx.fillText(`${data.firstname} ${data.lastname}`, 160, 50); // ปรับตำแหน่งของชื่อ
-
-    ctx.font = '18px tahoma'; // ลดขนาดของฟอนต์
-    ctx.fillText(`Position: ${data.position}`, 160, 80);
-    ctx.fillText(`Birthdate: ${data.birthdate}`, 160, 110);
-    ctx.fillText(`Gender: ${data.gender}`, 160, 140);
-    ctx.fillText(`Phone: ${data.phone}`, 160, 170);
-    ctx.fillText(`Email: ${data.email}`, 160, 200);
-    ctx.fillText(`Address: ${data.address}`, 160, 230);
-
-    // บันทึกเป็นไฟล์ภาพ
+    ctx.font = '32px tahoma'; // Increase font size
+    ctx.fillText(`${data.firstname} ${data.lastname}`, 200, 100); // Adjust position
+  
+    ctx.font = '24px tahoma'; // Decrease font size
+    ctx.fillText(`Position: ${data.position}`, 200, 160);
+    ctx.fillText(`Birthdate: ${data.birthdate}`, 200, 200);
+    ctx.fillText(`Gender: ${data.gender}`, 200, 240);
+    ctx.fillText(`Phone: ${data.phone}`, 200, 280);
+    ctx.fillText(`Email: ${data.email}`, 200, 320);
+    ctx.fillText(`Address: ${data.address}`, 200, 360);
+  
+    // Save the canvas as a PNG image
     const buffer = canvas.toBuffer('image/png');
     fs.writeFileSync(outputPath, buffer);
-}
+  }
 
 // ฟังก์ชันอัปโหลดภาพไปยังเซิร์ฟเวอร์
 async function uploadImage(filePath, userId) {
