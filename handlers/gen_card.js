@@ -12,8 +12,8 @@ const api = "https://business-api-638w.onrender.com";
 
 // ฟังก์ชันวาด Business Card
 async function drawCard(data, outputPath) {
-    const width = 600;
-    const height = 300;
+    const width = 950;
+    const height = 550;
     const canvas = createCanvas(width, height);
     const ctx = canvas.getContext('2d');
 
