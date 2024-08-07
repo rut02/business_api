@@ -7,8 +7,13 @@ const admin = require('../admin.js');
 const db = admin.firestore();
 const api = "https://business-api-638w.onrender.com";
 
-// Load custom font
-// registerFont(path.join(__dirname, './static/NotoSans_Condensed-Bold.ttf'), { family: 'NotoSans' });
+// ตรวจสอบเส้นทางฟอนต์
+const fontPath = path.join(__dirname, 'THSarabunNew.ttf');
+if (fs.existsSync(fontPath)) {
+    registerFont(fontPath, { family: 'THSarabunNew' });
+} else {
+    console.error('Font file not found:', fontPath);
+}
 
 // ฟังก์ชันวาด Business Card
 async function drawCard(data, outputPath) {
@@ -17,30 +22,30 @@ async function drawCard(data, outputPath) {
     const canvas = createCanvas(canvasWidth, canvasHeight);
     const ctx = canvas.getContext('2d');
   
-    // Draw the background
+    // วาดพื้นหลัง
     ctx.fillStyle = '#fff';
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
   
-    // Draw profile image
+    // วาดภาพโปรไฟล์
     if (data.profile) {
-      try {
-        const profileImage = await loadImage(data.profile);
-        ctx.drawImage(profileImage, 35, 95, 150, 150); // Increase the size of the profile image
-      } catch (err) {
-        console.error('Error loading profile image:', err);
-      }
+        try {
+            const profileImage = await loadImage(data.profile);
+            ctx.drawImage(profileImage, 35, 95, 150, 150);
+        } catch (err) {
+            console.error('Error loading profile image:', err);
+        }
     }
   
-    // Draw user data
+    // วาดข้อมูลผู้ใช้
     ctx.fillStyle = '#333';
-    ctx.font = '32px Tahoma'; // Increase font size
-    ctx.textAlign = 'left'; // Add text alignment
+    ctx.font = '32px THSarabunNew';
+    ctx.textAlign = 'left';
   
     const userDataX = 230;
     const userDataY = 130;
-    ctx.fillText(`${data.firstname} ${data.lastname}`, userDataX, userDataY-10); // Adjust position
+    ctx.fillText(`${data.firstname} ${data.lastname}`, userDataX, userDataY - 10);
   
-    ctx.font = '24px Tahoma'; // Decrease font size
+    ctx.font = '24px THSarabunNew';
     const userDataSpacing = 40;
     ctx.fillText(`Position: ${data.position}`, userDataX, userDataY + userDataSpacing);
     ctx.fillText(`Birthdate: ${data.birthdate}`, userDataX, userDataY + userDataSpacing * 2);
@@ -49,10 +54,10 @@ async function drawCard(data, outputPath) {
     ctx.fillText(`Email: ${data.email}`, userDataX, userDataY + userDataSpacing * 5);
     ctx.fillText(`Address: ${data.address}`, userDataX, userDataY + userDataSpacing * 6);
   
-    // Save the canvas as a PNG image
+    // บันทึกเป็นไฟล์ภาพ PNG
     const buffer = canvas.toBuffer('image/png');
     fs.writeFileSync(outputPath, buffer);
-  }
+}
 
 // ฟังก์ชันอัปโหลดภาพไปยังเซิร์ฟเวอร์
 async function uploadImage(filePath, userId) {
