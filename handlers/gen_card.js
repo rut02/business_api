@@ -46,7 +46,7 @@ async function drawCard(data, outputPath) {
     ctx.fillText(`${data.firstname} ${data.lastname}`, userDataX, userDataY - 10);
   
     ctx.font = '34px THSarabunNew';
-    const userDataSpacing = 20;
+    const userDataSpacing = 38;
     ctx.fillText(`Position: ${data.position}`, userDataX, userDataY + userDataSpacing);
     ctx.fillText(`Birthdate: ${data.birthdate}`, userDataX, userDataY + userDataSpacing * 2);
     ctx.fillText(`Gender: ${data.gender}`, userDataX, userDataY + userDataSpacing * 3);
