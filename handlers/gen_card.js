@@ -38,14 +38,14 @@ async function drawCard(data, outputPath) {
   
     // วาดข้อมูลผู้ใช้
     ctx.fillStyle = '#333';
-    ctx.font = '32px THSarabunNew';
+    ctx.font = '42px THSarabunNew';
     ctx.textAlign = 'left';
   
     const userDataX = 230;
     const userDataY = 130;
     ctx.fillText(`${data.firstname} ${data.lastname}`, userDataX, userDataY - 10);
   
-    ctx.font = '24px THSarabunNew';
+    ctx.font = '34px THSarabunNew';
     const userDataSpacing = 40;
     ctx.fillText(`Position: ${data.position}`, userDataX, userDataY + userDataSpacing);
     ctx.fillText(`Birthdate: ${data.birthdate}`, userDataX, userDataY + userDataSpacing * 2);
