@@ -170,7 +170,7 @@ module.exports.checkRequest = async (req, res) => {
     }
     catch (error) {
         console.log(error)
-        res.status(500).json({ status: true });
+        res.status(500).json({ status: false });
     }
 }
 
