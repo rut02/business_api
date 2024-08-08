@@ -115,6 +115,7 @@ app.delete('/positions/:id', positionController.deletePosition);
 
 const loginController = require('./handlers/login');
 app.post('/login', loginController.login);
+app.post('/forgotpassword', loginController.forgotPassword);
 // app.post('/logout', loginController.logout);
 
 const requestController = require('./handlers/request');
@@ -175,5 +176,6 @@ app.get('/history/user/:userId', historyController.getHistoryByUserId);
 app.get('/history/friend/:friendId', historyController.getHistoryByFriendId);
 app.get('/history/action/:action', historyController.getHistoryByAction);
 app.get('/friendstats/user/:userId', historyController.getFriendStatsByUserId);
+
 
 

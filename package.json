@@ -22,10 +22,12 @@
     "firebase-admin": "^11.0.0",
     "form-data": "^4.0.0",
     "fs": "^0.0.1-security",
+    "googleapis": "^140.0.1",
     "html-to-image": "^1.11.11",
     "jimp": "^0.22.12",
     "jsdom": "^24.1.0",
     "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.14",
     "puppeteer": "^22.11.1",
     "qrcode-reader": "^1.0.4",
     "ws": "^8.18.0"
