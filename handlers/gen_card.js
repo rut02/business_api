@@ -23,7 +23,7 @@ async function drawCard(data, outputPath) {
     const ctx = canvas.getContext('2d');
   
     // วาดพื้นหลัง
-    ctx.fillStyle = "ADD8E6";
+    ctx.fillStyle = "#ADD8E6";
     ctx.fillRect(0, 0, canvasWidth, canvasHeight);
   
     // วาดภาพโปรไฟล์
