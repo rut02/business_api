@@ -42,8 +42,8 @@ app.get('/', (req, res) => {
 
 // REST API endpoints for messages
 app.get('/messages', messageHandlers.getMessages);
-app.get('/messages/sender/:senderId', messageHandlers.getMessagesBySenderId);
-app.get('/messages/receiver/:receiverId', messageHandlers.getMessagesByReceiverId);
+app.get('/messages/sender/:userId/:friendId', messageHandlers.getMessagesBySenderId);
+app.get('/messages/receiver/:userId/:friendId', messageHandlers.getMessagesByReceiverId);
 
 // Other routes for your application
 const companyController = require('./handlers/company');
@@ -115,7 +115,10 @@ app.delete('/positions/:id', positionController.deletePosition);
 
 const loginController = require('./handlers/login');
 app.post('/login', loginController.login);
-app.post('/forgotpassword', loginController.forgotPassword);
+// app.post('/forgotpassword', loginController.forgotPassword);
+// app.post('/createaccount', loginController.createAccount);
+// app.post('/loginfirebase', loginController.loginfirebase);
+// app.post('/sendemail', loginController.sendPasswordResetEmail);
 // app.post('/logout', loginController.logout);
 
 const requestController = require('./handlers/request');

@@ -69,51 +69,62 @@ module.exports = {
         }
     },
 
-    getMessagesBySenderId: async (req, res) => {
+    getMessagesByReceiverId: async (req, res) => {
         try {
-            console.log("getMessagesBySenderId");
-            const senderId = req.params.senderId;
-            const messagesSnapshot = await db.collection('messages').where('senderId', '==', senderId).get();
-
+            console.log("getMessagesByReceiverId");
+            const userId = req.params.userId;
+            const friendId = req.params.friendId;
+    
+            const messagesSnapshot = await db.collection('messages')
+                .where('receiverId', '==', userId)
+                .where('senderId', '==', friendId)
+                .get();
+    
             if (messagesSnapshot.empty) {
-                return res.status(404).json({ message: 'No messages found for this sender' });
+                return res.status(404).json({ message: 'No messages found for this receiver' });
             }
-
+    
             const messages = messagesSnapshot.docs.map(doc => {
                 const data = doc.data();
                 data.id = doc.id;
                 // data.dateTime = format(data.dateTime.toDate(), 'yyyy-MM-dd HH:mm:ss');
                 return data;
             });
+    
+            res.json(messages);
+        } catch (error) {
+            console.error('Error getting messages by receiver ID:', error);
+            res.status(500).json({ message: 'Error getting messages by receiver ID: ' + error.message });
+        }
+    },
+    
 
+    getMessagesBySenderId: async (req, res) => {
+        try {
+            console.log("getMessagesBySenderId");
+            const userId = req.params.userId;
+            const friendId = req.params.friendId;
+    
+            const messagesSnapshot = await db.collection('messages')
+                .where('senderId', '==', userId)
+                .where('receiverId', '==', friendId)
+                .get();
+    
+            if (messagesSnapshot.empty) {
+                return res.status(404).json({ message: 'No messages found for this sender' });
+            }
+    
+            const messages = messagesSnapshot.docs.map(doc => {
+                const data = doc.data();
+                data.id = doc.id;
+                // data.dateTime = format(data.dateTime.toDate(), 'yyyy-MM-dd HH:mm:ss');
+                return data;
+            });
+    
             res.json(messages);
         } catch (error) {
             console.error('Error getting messages by sender ID:', error);
             res.status(500).json({ message: 'Error getting messages by sender ID: ' + error.message });
         }
     },
-
-    getMessagesByReceiverId: async (req, res) => {
-        try {
-            console.log("getMessagesByReceiverId");
-            const receiverId = req.params.receiverId;
-            const messagesSnapshot = await db.collection('messages').where('receiverId', '==', receiverId).get();
-
-            if (messagesSnapshot.empty) {
-                return res.status(404).json({ message: 'No messages found for this receiver' });
-            }
-
-            const messages = messagesSnapshot.docs.map(doc => {
-                const data = doc.data();
-                data.id = doc.id;
-                // data.dateTime = format(data.dateTime.toDate(), 'yyyy-MM-dd HH:mm:ss');
-                return data;
-            });
-
-            res.json(messages);
-        } catch (error) {
-            console.error('Error getting messages by receiver ID:', error);
-            res.status(500).json({ message: 'Error getting messages by receiver ID: ' + error.message });
-        }
-    }
 };
