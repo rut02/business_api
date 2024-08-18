@@ -48,11 +48,11 @@ async function drawCard(data, outputPath) {
     ctx.font = '34px THSarabunNew';
     const userDataSpacing = 38;
     ctx.fillText(`Position: ${data.position}`, userDataX, userDataY + userDataSpacing);
-    ctx.fillText(`Birthdate: ${data.birthdate}`, userDataX, userDataY + userDataSpacing * 2);
-    ctx.fillText(`Gender: ${data.gender}`, userDataX, userDataY + userDataSpacing * 3);
+    ctx.fillText(`Email: ${data.email}`, userDataX, userDataY + userDataSpacing * 2);
+    ctx.fillText(`Address: ${data.address}`, userDataX, userDataY + userDataSpacing * 3);
     ctx.fillText(`Phone: ${data.phone}`, userDataX, userDataY + userDataSpacing * 4);
-    ctx.fillText(`Email: ${data.email}`, userDataX, userDataY + userDataSpacing * 5);
-    ctx.fillText(`Address: ${data.address}`, userDataX, userDataY + userDataSpacing * 6);
+    ctx.fillText(`Gender: ${data.gender}`, userDataX, userDataY + userDataSpacing * 5);
+    ctx.fillText(`Age: ${data.age}`, userDataX, userDataY + userDataSpacing * 6);
   
     // บันทึกเป็นไฟล์ภาพ PNG
     const buffer = canvas.toBuffer('image/png');
