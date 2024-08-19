@@ -204,3 +204,31 @@ module.exports.deleteRequest = async (req, res) => {
         res.status(500).json({ message: 'Error deleting request: ' + error.message });
     }
 };
+module.exports.deleteRequestByRequesterAndResponder = async (req, res) => {
+    try {
+        const { requesterId, responderId } = req.params; // รับ requesterId และ responderId จาก URL parameters
+
+        // ค้นหาคำขอที่มี requesterId และ responderId ที่ตรงกัน
+        const requestSnapshot = await db.collection('requests')
+            .where('requesterId', 'in', [requesterId, responderId])
+            .where('responderId', 'in', [requesterId, responderId])
+            .get();
+
+        if (requestSnapshot.empty) {
+            return res.status(404).json({ message: 'Request not found' });
+        }
+
+        // ลบคำขอทั้งหมดที่ตรงกัน
+        const batch = db.batch(); // ใช้ batch สำหรับลบเอกสารหลายรายการในครั้งเดียว
+        requestSnapshot.forEach(doc => {
+            batch.delete(doc.ref);
+        });
+        await batch.commit();
+
+        res.json({ message: 'Request(s) deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting request:', error);
+        res.status(500).json({ message: 'Error deleting request: ' + error.message });
+    }
+};
+

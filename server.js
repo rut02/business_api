@@ -131,6 +131,7 @@ app.get('/requests/by-responder/:responderId', requestController.getRequestsByRe
 app.get('/requests/by-requester/:requesterId', requestController.getRequestsByRequesterId);
 app.put('/requests/:id', requestController.updateRequest);
 app.delete('/requests/:id', requestController.deleteRequest);
+app.delete('/requests/:requesterId/:responderId', requestController.deleteRequestByRequesterAndResponder);
 
 const friendController = require('./handlers/friend');
 app.post('/friends', friendController.createFriend);
