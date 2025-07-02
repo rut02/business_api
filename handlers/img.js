@@ -7,15 +7,16 @@ const db = admin.firestore();
 const getSignedUrl = async (filePath) => {
     try {
         const [url] = await bucket.file(filePath).getSignedUrl({
-            action: 'read', // กำหนดการดำเนินการ (เช่น 'read', 'write')
-            expires: '01-01-2025' // กำหนดเวลาที่ลิงก์จะหมดอายุ (วันที่/เวลา)
+            action: 'read',
+            expires: Date.now() + 1000 * 60 * 60 * 24 * 180 // 6 เดือน
         });
-        return url; // คืนค่าลิงก์ที่เซ็นชื่อแล้ว
+        return url;
     } catch (error) {
         console.error('Error generating signed URL:', error);
-        throw error; // ส่งข้อผิดพลาดกลับไป
+        throw error;
     }
 };
+
 
 // img.js
 
@@ -37,10 +38,7 @@ const uploadImage = async (req) => {
         });
 
         // รับ URL ที่เซ็นชื่อแล้ว
-        const [signedUrl] = await fileRef.getSignedUrl({
-            action: 'read',
-            expires: '01-01-2025',
-        });
+        const signedUrl = await getSignedUrl(filePath);
 
         return { Url: signedUrl, filePath };
     } catch (error) {
